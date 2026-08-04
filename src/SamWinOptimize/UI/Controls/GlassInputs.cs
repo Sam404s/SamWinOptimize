@@ -6,8 +6,8 @@ using System.Drawing.Drawing2D;
 namespace SamWinOptimize.UI.Controls;
 
 /// <summary>
-/// A glass-styled text field that keeps the native text editing behavior while
-/// owning the surrounding surface, placeholder, focus ring, and padding.
+/// A native-feeling light text field with a quiet focus ring and fixed content
+/// bounds. The editor never reaches the trailing search affordance.
 /// </summary>
 public sealed class GlassTextBox : UserControl
 {
@@ -28,7 +28,7 @@ public sealed class GlassTextBox : UserControl
         _editor = new TextBox
         {
             BorderStyle = BorderStyle.None,
-            BackColor = Theme.SurfaceRaised,
+            BackColor = Color.White,
             ForeColor = Theme.TextPrimary,
             Font = Theme.Font(9.8f),
             Location = new Point(15, 9),
@@ -100,7 +100,7 @@ public sealed class GlassTextBox : UserControl
         graphics.SmoothingMode = SmoothingMode.AntiAlias;
         var bounds = new Rectangle(0, 0, Math.Max(1, Width - 1), Math.Max(1, Height - 1));
         using var path = Theme.RoundedRectangle(bounds, Theme.RadiusSm);
-        using var fill = new LinearGradientBrush(bounds, Theme.SurfaceRaised, Theme.Surface, 90f);
+        using var fill = new SolidBrush(Color.White);
         graphics.FillPath(fill, path);
         using var border = new Pen(_focused ? Theme.Accent : Theme.BorderStrong, _focused ? 1.35f : 1f);
         graphics.DrawPath(border, path);
@@ -174,7 +174,7 @@ public sealed class GlassSelect : UserControl
             ShowImageMargin = false,
             ShowCheckMargin = false,
             AutoSize = false,
-            BackColor = Theme.SurfaceRaised,
+            BackColor = Color.White,
             ForeColor = Theme.TextPrimary,
             Renderer = new GlassMenuRenderer(),
             Font = Theme.Font(9.5f),
@@ -279,9 +279,7 @@ public sealed class GlassSelect : UserControl
         graphics.SmoothingMode = SmoothingMode.AntiAlias;
         var bounds = new Rectangle(0, 0, Math.Max(1, Width - 1), Math.Max(1, Height - 1));
         using var path = Theme.RoundedRectangle(bounds, Theme.RadiusSm);
-        using var fill = new LinearGradientBrush(bounds,
-            _hovered ? Theme.SurfaceHover : Theme.SurfaceRaised,
-            Theme.Surface, 90f);
+        using var fill = new SolidBrush(_hovered ? Theme.SurfaceHover : Color.White);
         graphics.FillPath(fill, path);
         using var border = new Pen(_focused || _hovered ? Theme.Accent : Theme.BorderStrong,
             _focused ? 1.35f : 1f);

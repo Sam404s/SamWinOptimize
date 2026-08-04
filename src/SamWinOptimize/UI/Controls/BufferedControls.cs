@@ -144,29 +144,9 @@ public sealed class BackdropPanel : BufferedPanel
     protected override void OnPaintBackground(PaintEventArgs eventArgs)
     {
         var graphics = eventArgs.Graphics;
-        var start = SidebarMode ? Theme.SidebarRaised : Theme.Canvas;
-        var end = SidebarMode ? Theme.Sidebar : Theme.CanvasSoft;
-        graphics.Clear(start);
-        graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        graphics.Clear(SidebarMode ? Theme.Sidebar : Theme.Canvas);
 
-        using (var gradient = new LinearGradientBrush(ClientRectangle, start, end, 105f))
-        {
-            graphics.FillRectangle(gradient, ClientRectangle);
-        }
-
-        var glowBounds = SidebarMode
-            ? new Rectangle(-110, -80, 300, 260)
-            : new Rectangle(Math.Max(0, Width - 320), -100, 440, 300);
-        using var glowPath = new GraphicsPath();
-        glowPath.AddEllipse(glowBounds);
-        using var glowBrush = new PathGradientBrush(glowPath)
-        {
-            CenterColor = Color.FromArgb(SidebarMode ? 26 : 34, Theme.Accent),
-            SurroundColors = [Color.FromArgb(0, Theme.Accent)]
-        };
-        graphics.FillPath(glowBrush, glowPath);
-
-        using var hairline = new Pen(Color.FromArgb(38, Theme.GlassHighlight));
+        using var hairline = new Pen(Theme.Border);
         if (SidebarMode)
         {
             graphics.DrawLine(hairline, Width - 1, 0, Width - 1, Height);

@@ -4,50 +4,50 @@ namespace SamWinOptimize.UI;
 
 /// <summary>
 /// Design tokens for the SamWinOptimize visual system.
-/// Direction: atmospheric dark glass, cyan energy accents, quiet depth.
+/// Direction: light macOS utility, quiet surfaces, restrained blue accents.
 /// </summary>
 internal static class Theme
 {
-    // ── Atmospheric canvas ───────────────────────────────────────
-    public static readonly Color Canvas = Color.FromArgb(7, 16, 29);          // #07101D
-    public static readonly Color CanvasSoft = Color.FromArgb(10, 27, 44);     // #0A1B2C
-    public static readonly Color CanvasRaised = Color.FromArgb(13, 35, 55);   // #0D2337
-    public static readonly Color Sidebar = Color.FromArgb(8, 22, 38);         // #081626
-    public static readonly Color SidebarRaised = Color.FromArgb(14, 35, 57);  // #0E2339
+    // ── macOS-inspired canvas ────────────────────────────────────
+    public static readonly Color Canvas = Color.FromArgb(246, 246, 248);       // #F6F6F8
+    public static readonly Color CanvasSoft = Color.FromArgb(239, 239, 244);   // #EFEFF4
+    public static readonly Color CanvasRaised = Color.White;                    // #FFFFFF
+    public static readonly Color Sidebar = Color.FromArgb(242, 242, 247);      // #F2F2F7
+    public static readonly Color SidebarRaised = Color.FromArgb(235, 235, 241); // #EBEBF1
 
-    // ── Glass surfaces ───────────────────────────────────────────
-    public static readonly Color Surface = Color.FromArgb(16, 39, 59);        // #10273B
-    public static readonly Color SurfaceRaised = Color.FromArgb(20, 51, 74);   // #14334A
-    public static readonly Color SurfaceHover = Color.FromArgb(26, 67, 91);    // #1A435B
-    public static readonly Color SurfaceStrong = Color.FromArgb(32, 78, 104);  // #204E68
-    public static readonly Color GlassTop = Color.FromArgb(25, 61, 84);
-    public static readonly Color GlassBottom = Color.FromArgb(11, 29, 48);
-    public static readonly Color GlassHighlight = Color.FromArgb(80, 176, 213);
-    public static readonly Color Shadow = Color.FromArgb(90, 0, 0, 0);
+    // ── Quiet utility surfaces ───────────────────────────────────
+    public static readonly Color Surface = Color.White;                         // #FFFFFF
+    public static readonly Color SurfaceRaised = Color.White;                    // #FFFFFF
+    public static readonly Color SurfaceHover = Color.FromArgb(242, 246, 252); // #F2F6FC
+    public static readonly Color SurfaceStrong = Color.FromArgb(231, 233, 238); // #E7E9EE
+    public static readonly Color GlassTop = Color.White;
+    public static readonly Color GlassBottom = Color.FromArgb(250, 250, 252);
+    public static readonly Color GlassHighlight = Color.White;
+    public static readonly Color Shadow = Color.FromArgb(24, 0, 0, 0);
 
     // ── Text ─────────────────────────────────────────────────────
-    public static readonly Color TextPrimary = Color.FromArgb(238, 248, 255);  // #EEF8FF
-    public static readonly Color TextSecondary = Color.FromArgb(164, 190, 210);// #A4BED2
-    public static readonly Color TextMuted = Color.FromArgb(103, 137, 163);    // #6789A3
+    public static readonly Color TextPrimary = Color.FromArgb(29, 29, 31);      // #1D1D1F
+    public static readonly Color TextSecondary = Color.FromArgb(91, 95, 105);  // #5B5F69
+    public static readonly Color TextMuted = Color.FromArgb(142, 142, 147);    // #8E8E93
 
     // ── Borders ──────────────────────────────────────────────────
-    public static readonly Color Border = Color.FromArgb(34, 76, 101);        // #224C65
-    public static readonly Color BorderStrong = Color.FromArgb(61, 111, 139);  // #3D6F8B
-    public static readonly Color BorderGlow = Color.FromArgb(93, 211, 242);
+    public static readonly Color Border = Color.FromArgb(218, 218, 224);        // #DADAE0
+    public static readonly Color BorderStrong = Color.FromArgb(194, 195, 202);  // #C2C3CA
+    public static readonly Color BorderGlow = Color.FromArgb(94, 156, 219);     // #5E9CDB
 
-    // ── Accent: electric cyan / deep blue ────────────────────────
-    public static readonly Color Accent = Color.FromArgb(67, 222, 255);       // #43DEFF
-    public static readonly Color AccentStrong = Color.FromArgb(15, 146, 211);  // #0F92D3
-    public static readonly Color AccentWash = Color.FromArgb(18, 62, 82);      // #123E52
-    public static readonly Color AccentSoft = Color.FromArgb(142, 239, 255);   // #8EEFFF
-    public static readonly Color AccentDeep = Color.FromArgb(8, 75, 117);      // #084B75
+    // ── Accent: calm system blue ─────────────────────────────────
+    public static readonly Color Accent = Color.FromArgb(10, 132, 255);         // #0A84FF
+    public static readonly Color AccentStrong = Color.FromArgb(0, 112, 232);    // #0070E8
+    public static readonly Color AccentWash = Color.FromArgb(232, 242, 255);    // #E8F2FF
+    public static readonly Color AccentSoft = Color.FromArgb(74, 145, 224);     // #4A91E0
+    public static readonly Color AccentDeep = Color.FromArgb(0, 88, 190);       // #0058BE
 
     // ── Semantic ─────────────────────────────────────────────────
-    public static readonly Color Success = Color.FromArgb(87, 226, 178);      // #57E2B2
-    public static readonly Color Warning = Color.FromArgb(255, 204, 102);     // #FFCC66
-    public static readonly Color Danger = Color.FromArgb(255, 112, 149);      // #FF7095
-    public static readonly Color DangerSurface = Color.FromArgb(68, 35, 56);   // #442338
-    public static readonly Color Info = Color.FromArgb(161, 143, 255);         // #A18FFF
+    public static readonly Color Success = Color.FromArgb(38, 142, 91);         // #268E5B
+    public static readonly Color Warning = Color.FromArgb(177, 116, 20);       // #B17414
+    public static readonly Color Danger = Color.FromArgb(207, 67, 67);          // #CF4343
+    public static readonly Color DangerSurface = Color.FromArgb(253, 238, 238); // #FDEEEE
+    public static readonly Color Info = Color.FromArgb(96, 86, 164);            // #6056A4
 
     // ── Spacing tokens ───────────────────────────────────────────
     public const int SpacingXs = 4;

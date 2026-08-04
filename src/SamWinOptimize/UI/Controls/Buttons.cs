@@ -141,34 +141,8 @@ public sealed class ActionButton : Button
         using var path = Theme.RoundedRectangle(bounds, Theme.RadiusMd);
         var background = ResolveBackground();
 
-        if (Enabled && (Kind == ActionButtonKind.Primary || _hovered))
-        {
-            using var glowPath = new GraphicsPath();
-            glowPath.AddEllipse(new Rectangle(-24, -28, Width / 2 + 72, Height + 44));
-            using var glowBrush = new PathGradientBrush(glowPath)
-            {
-                CenterColor = Color.FromArgb(_hovered ? 48 : 24, Theme.Accent),
-                SurroundColors = [Color.FromArgb(0, Theme.Accent)]
-            };
-            graphics.FillPath(glowBrush, glowPath);
-        }
-
-        graphics.SetClip(path);
-        if (Enabled && Kind == ActionButtonKind.Primary)
-        {
-            using var gradient = new LinearGradientBrush(
-                bounds,
-                Theme.Blend(background, Color.White, 0.18f),
-                Theme.Blend(background, Theme.AccentStrong, 0.42f),
-                25f);
-            graphics.FillRectangle(gradient, bounds);
-        }
-        else
-        {
-            using var brush = new SolidBrush(background);
-            graphics.FillPath(brush, path);
-        }
-        graphics.ResetClip();
+        using var brush = new SolidBrush(background);
+        graphics.FillPath(brush, path);
 
         using var border = new Pen(ResolveBorder(background), Kind == ActionButtonKind.Primary ? 1f : 1.1f);
         graphics.DrawPath(border, path);
@@ -249,8 +223,8 @@ public sealed class ActionButton : Button
     private Color ResolveTextColor() => Kind switch
     {
         ActionButtonKind.Primary => Color.White,
-        ActionButtonKind.Danger => Theme.TextPrimary,
-        _ => Theme.TextPrimary
+            ActionButtonKind.Danger => Theme.Danger,
+            _ => Theme.TextPrimary
     };
 }
 
@@ -386,7 +360,7 @@ public sealed class NavButton : Button
         AccessibleRole = AccessibleRole.PushButton;
         FlatStyle = FlatStyle.Flat;
         FlatAppearance.BorderSize = 0;
-        BackColor = Theme.SidebarRaised;
+        BackColor = Theme.Sidebar;
         Height = 64;
         Dock = DockStyle.Top;
         Cursor = Cursors.Hand;
@@ -488,15 +462,10 @@ public sealed class NavButton : Button
         if (Selected || _hovered || _pressed)
         {
             using var path = Theme.RoundedRectangle(bounds, Theme.RadiusMd);
-            var top = Selected ? Theme.Blend(Theme.AccentWash, Theme.Accent, 0.2f) : Theme.SurfaceHover;
-            var bottom = Selected ? Theme.Blend(Theme.AccentDeep, Theme.Surface, 0.32f) : Theme.SurfaceStrong;
-            graphics.SetClip(path);
-            using (var gradient = new LinearGradientBrush(bounds, top, bottom, 90f))
-            {
-                graphics.FillRectangle(gradient, bounds);
-            }
-            graphics.ResetClip();
-            using var border = new Pen(Color.FromArgb(Selected ? 180 : 100, Selected ? Theme.Accent : Theme.BorderStrong));
+            var fill = Selected ? Theme.AccentWash : Theme.SurfaceHover;
+            using var brush = new SolidBrush(fill);
+            graphics.FillPath(brush, path);
+            using var border = new Pen(Selected ? Theme.Accent : Theme.BorderStrong);
             graphics.DrawPath(border, path);
 
             if (Selected)

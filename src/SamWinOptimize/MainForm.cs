@@ -31,7 +31,7 @@ public sealed class MainForm : Form
         DoubleBuffered = true;
         SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer |
                  ControlStyles.ResizeRedraw, true);
-        HandleCreated += (_, _) => EnableDarkTitleBar();
+        HandleCreated += (_, _) => EnableLightTitleBar();
 
         var shell = new TableLayoutPanel
         {
@@ -84,7 +84,7 @@ public sealed class MainForm : Form
             AutoSizeMode = AutoSizeMode.GrowAndShrink,
             FlowDirection = FlowDirection.TopDown,
             WrapContents = false,
-            BackColor = Theme.SidebarRaised,
+            BackColor = Theme.Sidebar,
             Padding = new Padding(0),
             Margin = new Padding(0)
         };
@@ -380,14 +380,14 @@ public sealed class MainForm : Form
         _ => throw new ArgumentOutOfRangeException(nameof(route), route, null)
     };
 
-    private void EnableDarkTitleBar()
+    private void EnableLightTitleBar()
     {
         if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763))
         {
             return;
         }
 
-        var enabled = 1;
+        var enabled = 0;
         var result = DwmSetWindowAttribute(Handle, 20, ref enabled, sizeof(int));
         if (result != 0)
         {

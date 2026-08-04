@@ -10,7 +10,7 @@ public sealed class AppsPage : AppPage
     private readonly ReceiptStore _receiptStore;
     private readonly BufferedDataGridView _grid;
     private readonly GlassTextBox _searchBox;
-    private readonly Label _statusLabel;
+    private readonly BufferedLabel _statusLabel;
     private readonly ActionButton _uninstallButton;
     private IReadOnlyList<AppPackageInfo> _packages = [];
 
@@ -63,8 +63,10 @@ public sealed class AppsPage : AppPage
             Text = "\u5c1a\u672a\u8bfb\u53d6\u5e94\u7528\u5217\u8868",
             Font = Theme.Font(9.5f),
             ForeColor = Theme.TextSecondary,
+            AutoSize = false,
             AutoEllipsis = true,
             TextAlign = ContentAlignment.MiddleRight,
+            Padding = new Padding(0, 0, 10, 0),
             Size = new Size(290, 36),
             BackColor = Color.Transparent
         };
@@ -123,6 +125,7 @@ public sealed class AppsPage : AppPage
             _statusLabel.Location = new Point(28, 96);
             _statusLabel.Width = Math.Max(240, commandDeck.ClientSize.Width - 240);
             _statusLabel.TextAlign = ContentAlignment.MiddleLeft;
+            _statusLabel.Padding = new Padding(0);
             _uninstallButton.Location = new Point(commandDeck.ClientSize.Width - 194, 86);
         }
         else
@@ -131,6 +134,7 @@ public sealed class AppsPage : AppPage
             _statusLabel.Location = new Point(_uninstallButton.Left - 314, 34);
             _statusLabel.Width = 298;
             _statusLabel.TextAlign = ContentAlignment.MiddleRight;
+            _statusLabel.Padding = new Padding(0, 0, 10, 0);
         }
     }
 

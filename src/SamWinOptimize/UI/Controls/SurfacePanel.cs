@@ -13,8 +13,8 @@ public enum SurfaceStyle
 }
 
 /// <summary>
-/// Reusable glass surface. The control intentionally uses painted depth rather than
-/// opaque nested panels so the whole shell reads as one atmospheric workspace.
+/// Reusable light utility surface. The control keeps depth subtle so the shell
+/// reads like a native desktop workspace rather than a stack of dark cards.
 /// </summary>
 public class SurfacePanel : Panel
 {
@@ -121,55 +121,25 @@ public class SurfacePanel : Panel
         var bounds = new Rectangle(1, 1, Math.Max(1, Width - 3), Math.Max(1, Height - 3));
         using var path = Theme.RoundedRectangle(bounds, Radius);
 
-        // A compact shadow makes the panels float without looking like generic cards.
+        // A compact shadow keeps the panel separated from the light canvas.
         var shadowBounds = new Rectangle(bounds.X + 1, bounds.Y + 5, bounds.Width, bounds.Height);
         using var shadowPath = Theme.RoundedRectangle(shadowBounds, Radius);
         using var shadowBrush = new SolidBrush(Theme.Shadow);
         graphics.FillPath(shadowBrush, shadowPath);
 
         var fill = ResolveFill();
-        graphics.SetClip(path);
-        using (var glassBrush = new LinearGradientBrush(
-                   bounds,
-                   Theme.Blend(fill, Theme.GlassTop, 0.26f),
-                   Theme.Blend(fill, Theme.GlassBottom, 0.34f),
-                   90f))
+        using (var surfaceBrush = new SolidBrush(fill))
         {
-            graphics.FillRectangle(glassBrush, bounds);
+            graphics.FillPath(surfaceBrush, path);
         }
-
-        // Diffuse cyan bloom: a painted approximation of frosted glass catching light.
-        if (AccentEdge || SurfaceStyle == SurfaceStyle.Accent || _hovered)
-        {
-            var glowBounds = new Rectangle(
-                Math.Max(-bounds.Width / 2, bounds.Right - 170),
-                -80,
-                260,
-                220);
-            using var glowPath = new GraphicsPath();
-            glowPath.AddEllipse(glowBounds);
-            using var glowBrush = new PathGradientBrush(glowPath)
-            {
-                CenterColor = Color.FromArgb(_hovered ? 72 : 48, Theme.Accent),
-                SurroundColors = [Color.FromArgb(0, Theme.Accent)]
-            };
-            graphics.FillPath(glowBrush, glowPath);
-        }
-        graphics.ResetClip();
 
         var borderColor = _hovered ? Theme.BorderGlow : ResolveBorder();
-        using var border = new Pen(Color.FromArgb(_hovered ? 210 : 165, borderColor), _hovered ? 1.25f : 1f);
+        using var border = new Pen(borderColor, _hovered ? 1.25f : 1f);
         graphics.DrawPath(border, path);
-
-        var highlightBounds = new Rectangle(bounds.X + 1, bounds.Y + 1,
-            Math.Max(1, bounds.Width - 2), Math.Max(1, bounds.Height - 2));
-        using var highlightPath = Theme.RoundedRectangle(highlightBounds, Math.Max(6, Radius - 1));
-        using var highlightPen = new Pen(Color.FromArgb(38, Color.White), 1f);
-        graphics.DrawPath(highlightPen, highlightPath);
 
         if (AccentEdge || SurfaceStyle == SurfaceStyle.Accent)
         {
-            using var accentPen = new Pen(Color.FromArgb(205, Theme.AccentSoft), 1.35f);
+            using var accentPen = new Pen(Theme.AccentSoft, 1.35f);
             graphics.DrawPath(accentPen, path);
         }
     }
