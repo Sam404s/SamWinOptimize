@@ -19,7 +19,7 @@ public sealed class ToolboxPage : AppPage
         {
             Dock = DockStyle.Top,
             AutoSize = true,
-            AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            AutoSizeMode = AutoSizeMode.GrowOnly,
             FlowDirection = FlowDirection.TopDown,
             WrapContents = false,
             BackColor = Theme.Canvas,
@@ -69,7 +69,7 @@ public sealed class ToolboxPage : AppPage
             BackColor = Theme.Canvas,
             Margin = new Padding(0)
         };
-        header.Controls.Add(new Label
+        header.Controls.Add(new BufferedLabel
         {
             Text = title,
             Font = Theme.DisplayFont(15.5f, FontStyle.Bold),
@@ -78,7 +78,7 @@ public sealed class ToolboxPage : AppPage
             Location = new Point(0, 8),
             BackColor = Color.Transparent
         });
-        header.Controls.Add(new Label
+        header.Controls.Add(new BufferedLabel
         {
             Text = description,
             Font = Theme.Font(9.5f),
@@ -93,8 +93,9 @@ public sealed class ToolboxPage : AppPage
     private static FlowLayoutPanel CreateGrid() => new()
     {
         Width = 980,
-        AutoSize = true,
-        AutoSizeMode = AutoSizeMode.GrowAndShrink,
+        AutoSize = false,
+        AutoSizeMode = AutoSizeMode.GrowOnly,
+        FlowDirection = FlowDirection.LeftToRight,
         WrapContents = true,
         BackColor = Theme.Canvas,
         Padding = new Padding(0),
@@ -155,7 +156,7 @@ public sealed class ToolboxPage : AppPage
             Location = new Point(28, 28),
             Padding = new Padding(1)
         };
-        iconTile.Controls.Add(new Label
+        iconTile.Controls.Add(new BufferedLabel
         {
             Text = glyph,
             Font = Theme.IconFont(18),
@@ -164,7 +165,7 @@ public sealed class ToolboxPage : AppPage
             TextAlign = ContentAlignment.MiddleCenter,
             Dock = DockStyle.Fill
         });
-        var titleLabel = new Label
+        var titleLabel = new BufferedLabel
         {
             Text = title,
             Font = Theme.DisplayFont(13.5f, FontStyle.Bold),
@@ -173,7 +174,7 @@ public sealed class ToolboxPage : AppPage
             Location = new Point(102, 28),
             BackColor = Color.Transparent
         };
-        var descriptionLabel = new Label
+        var descriptionLabel = new BufferedLabel
         {
             Text = description,
             Font = Theme.Font(9.5f),
@@ -202,10 +203,16 @@ public sealed class ToolboxPage : AppPage
     private static void ResizeCards(FlowLayoutPanel flow, int available)
     {
         flow.Width = available;
-        var cardWidth = available >= 840 ? (available - 18) / 2 : available;
+        var columns = available >= 840 ? 2 : 1;
+        var cardWidth = columns == 2
+            ? (available - (columns * 18)) / columns
+            : available;
         foreach (Control card in flow.Controls)
         {
             card.Width = cardWidth;
         }
+
+        var rows = (int)Math.Ceiling(flow.Controls.Count / (double)columns);
+        flow.Height = Math.Max(1, rows * 218);
     }
 }

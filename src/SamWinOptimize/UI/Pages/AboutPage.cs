@@ -57,7 +57,7 @@ public sealed class AboutPage : AppPage
             Location = new Point(36, 38),
             Padding = new Padding(1)
         };
-        markTile.Controls.Add(new Label
+        markTile.Controls.Add(new BufferedLabel
         {
             Text = "S",
             Font = Theme.DisplayFont(31, FontStyle.Bold),
@@ -66,35 +66,41 @@ public sealed class AboutPage : AppPage
             TextAlign = ContentAlignment.MiddleCenter,
             Dock = DockStyle.Fill
         });
-        var title = new Label
+        var title = new BufferedLabel
         {
             Text = "SamWinOptimize",
             Font = Theme.DisplayFont(26, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
-            AutoSize = true,
-            Location = new Point(144, 38),
+            AutoSize = false,
+            AutoEllipsis = true,
+            Location = new Point(144, 28),
+            Size = new Size(700, 58),
             BackColor = Color.Transparent
         };
         var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "1.0.0";
-        var metadata = new Label
+        var metadata = new BufferedLabel
         {
             Text = $"VERSION {version}  /  .NET {Environment.Version.Major}  /  WINDOWS X64 \u00b7 ARM64",
             Font = Theme.MonoFont(8.2f, FontStyle.Bold),
             ForeColor = Theme.Accent,
-            AutoSize = true,
-            Location = new Point(146, 88),
+            AutoSize = false,
+            AutoEllipsis = true,
+            Location = new Point(146, 98),
+            Size = new Size(700, 22),
             BackColor = Color.Transparent
         };
-        var description = new Label
+        var description = new BufferedLabel
         {
             Text = "\u7b80\u5355\u4e0d\u610f\u5473\u7740\u7c97\u7cd9\u3002\u6bcf\u4e2a\u7cfb\u7edf\u64cd\u4f5c\u90fd\u6709\u660e\u786e\u610f\u56fe\u3001\u98ce\u9669\u7b49\u7ea7\u3001\u7ba1\u7406\u5458\u8fb9\u754c\u548c\u9000\u51fa\u51b2\u7a81\u539f\u8def\u5f84\u3002",
-            Font = Theme.Font(11.2f),
+            Font = Theme.Font(10.5f),
             ForeColor = Theme.TextSecondary,
+            AutoSize = false,
+            WordWrap = true,
             Location = new Point(38, 152),
             Size = new Size(840, 68),
             BackColor = Color.Transparent
         };
-        var promise = new Label
+        var promise = new BufferedLabel
         {
             Text = "\u672c\u5730\u8fd0\u884c  \u00b7  \u4e0d\u6267\u884c\u8fdc\u7a0b\u811a\u672c  \u00b7  \u6bcf\u4e00\u6b65\u53ef\u8bb0\u5f55",
             Font = Theme.Font(9.5f, FontStyle.Bold),
@@ -108,7 +114,13 @@ public sealed class AboutPage : AppPage
         hero.Controls.Add(metadata);
         hero.Controls.Add(description);
         hero.Controls.Add(promise);
-        hero.Resize += (_, _) => description.Width = Math.Max(520, hero.ClientSize.Width - 76);
+        hero.Resize += (_, _) =>
+        {
+            var textWidth = Math.Max(420, hero.ClientSize.Width - 76);
+            title.Width = Math.Max(240, hero.ClientSize.Width - 180);
+            metadata.Width = Math.Max(240, hero.ClientSize.Width - 184);
+            description.Width = textWidth;
+        };
         return hero;
     }
 
@@ -117,13 +129,13 @@ public sealed class AboutPage : AppPage
         var panel = new SurfacePanel
         {
             Width = 980,
-            Height = 308,
+            Height = 334,
             Padding = new Padding(32),
             SurfaceStyle = SurfaceStyle.Raised,
             Margin = new Padding(0, 0, 0, 28)
         };
         panel.Controls.Add(CreateTitle("\u4ea7\u54c1\u539f\u5219", 28));
-        panel.Controls.Add(new Label
+        panel.Controls.Add(new BufferedLabel
         {
             Text = "\u514b\u5236\u7684\u6743\u9650\u3001\u900f\u660e\u7684\u6267\u884c\u3001\u6e05\u6670\u7684\u8fb9\u754c\u3002",
             Font = Theme.Font(9.5f),
@@ -137,7 +149,7 @@ public sealed class AboutPage : AppPage
             ColumnCount = 3,
             RowCount = 1,
             Location = new Point(32, 106),
-            Size = new Size(920, 172),
+            Size = new Size(920, 198),
             BackColor = Color.Transparent,
             Margin = new Padding(0),
             Padding = new Padding(0)
@@ -165,7 +177,7 @@ public sealed class AboutPage : AppPage
             Margin = new Padding(0, 0, 0, 20)
         };
         panel.Controls.Add(CreateTitle("\u4ece\u811a\u672c\u5230\u7ef4\u62a4\u4f19\u4f34", 28));
-        var text = new Label
+        var text = new BufferedLabel
         {
             Text = "\u7cfb\u7edf\u4f18\u5316\u3001\u7a7a\u95f4\u6e05\u7406\u3001Appx \u7ba1\u7406\u3001\u72b6\u6001\u68c0\u67e5\u3001\u8bb0\u5f55\u8fd8\u539f\u4e0e\u5de5\u5177\u7bb1\u516d\u5927\u6a21\u5757\uff0c\u8986\u76d6\u65e5\u5e38\u7ef4\u62a4\u7684\u5b8c\u6574\u94fe\u8def\u3002\u6bcf\u4e2a\u64cd\u4f5c\u90fd\u7ecf\u8fc7\u900f\u660e\u5ba1\u67e5\u3002",
             Font = Theme.Font(10),
@@ -188,7 +200,7 @@ public sealed class AboutPage : AppPage
         return panel;
     }
 
-    private static Label CreateTitle(string text, int top) => new()
+    private static BufferedLabel CreateTitle(string text, int top) => new()
     {
         Text = text,
         Font = Theme.DisplayFont(15.5f, FontStyle.Bold),
@@ -208,7 +220,7 @@ public sealed class AboutPage : AppPage
             SurfaceStyle = SurfaceStyle.Quiet,
             Radius = Theme.RadiusLg
         };
-        card.Controls.Add(new Label
+        card.Controls.Add(new BufferedLabel
         {
             Text = index,
             Font = Theme.MonoFont(8.5f, FontStyle.Bold),
@@ -217,7 +229,7 @@ public sealed class AboutPage : AppPage
             Location = new Point(22, 20),
             BackColor = Color.Transparent
         });
-        card.Controls.Add(new Label
+        card.Controls.Add(new BufferedLabel
         {
             Text = title,
             Font = Theme.DisplayFont(13, FontStyle.Bold),
@@ -226,13 +238,17 @@ public sealed class AboutPage : AppPage
             Location = new Point(22, 52),
             BackColor = Color.Transparent
         });
-        var body = new Label
+        var body = new BufferedLabel
         {
             Text = description,
             Font = Theme.Font(9.2f),
             ForeColor = Theme.TextSecondary,
             Location = new Point(22, 90),
-            Size = new Size(250, 62),
+            Size = new Size(250, 84),
+            AutoSize = false,
+            WordWrap = true,
+            AutoEllipsis = false,
+            TextAlign = ContentAlignment.TopLeft,
             BackColor = Color.Transparent
         };
         card.Controls.Add(body);

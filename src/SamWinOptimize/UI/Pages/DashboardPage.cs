@@ -46,44 +46,46 @@ public sealed class DashboardPage : AppPage
 
         var hero = new SurfacePanel
         {
-            Height = 280,
+            Height = 236,
             Width = 980,
-            Padding = new Padding(36),
+            Padding = new Padding(28),
             SurfaceStyle = SurfaceStyle.Accent,
-            Margin = new Padding(0, 0, 0, 24)
+            Margin = new Padding(0, 0, 0, 18)
         };
-        var overline = new Label
+        var overline = new BufferedLabel
         {
             Text = "DEVICE STATUS  /  READY",
             Font = Theme.MonoFont(8.2f, FontStyle.Bold),
             ForeColor = Theme.Accent,
             AutoSize = true,
-            Location = new Point(36, 36),
+            Location = new Point(28, 24),
             BackColor = Color.Transparent
         };
-        _machineLabel = new Label
+        _machineLabel = new BufferedLabel
         {
             Text = Environment.MachineName,
-            Font = Theme.DisplayFont(29, FontStyle.Bold),
+            Font = Theme.DisplayFont(24, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
             AutoEllipsis = true,
-            Location = new Point(35, 72),
-            Size = new Size(650, 56),
+            TextAlign = ContentAlignment.MiddleLeft,
+            Location = new Point(27, 54),
+            Size = new Size(650, 42),
             BackColor = Color.Transparent
         };
-        _systemLabel = new Label
+        _systemLabel = new BufferedLabel
         {
-            Text = "\u6b63\u5728\u8bfb\u53d6 Windows \u7248\u672c\u4e0e\u8bbe\u5907\u72b6\u6001\u2026",
+            Text = "正在读取 Windows 版本与设备状态…",
             Font = Theme.Font(10.5f),
             ForeColor = Theme.TextSecondary,
             AutoEllipsis = true,
-            Location = new Point(38, 140),
-            Size = new Size(650, 34),
+            TextAlign = ContentAlignment.MiddleLeft,
+            Location = new Point(30, 101),
+            Size = new Size(650, 28),
             BackColor = Color.Transparent
         };
         var statusFlow = new FlowLayoutPanel
         {
-            Location = new Point(38, 192),
+            Location = new Point(30, 140),
             AutoSize = true,
             BackColor = Color.Transparent,
             WrapContents = false
@@ -95,7 +97,7 @@ public sealed class DashboardPage : AppPage
 
         var actionPanel = new FlowLayoutPanel
         {
-            Size = new Size(196, 132),
+            Size = new Size(196, 108),
             FlowDirection = FlowDirection.TopDown,
             WrapContents = false,
             BackColor = Color.Transparent,
@@ -106,15 +108,15 @@ public sealed class DashboardPage : AppPage
         {
             Text = "\u67e5\u770b\u7cfb\u7edf\u4f18\u5316",
             Kind = ActionButtonKind.Primary,
-            Size = new Size(194, 52),
-            Margin = new Padding(0, 0, 0, 16)
+            Size = new Size(194, 46),
+            Margin = new Padding(0, 0, 0, 10)
         };
         optimizeButton.Click += (_, _) => _navigate(AppRoute.Optimize);
         var cleanupButton = new ActionButton
         {
             Text = "\u91ca\u653e\u78c1\u76d8\u7a7a\u95f4",
             Kind = ActionButtonKind.Secondary,
-            Size = new Size(194, 52),
+            Size = new Size(194, 46),
             Margin = new Padding(0)
         };
         cleanupButton.Click += (_, _) => _navigate(AppRoute.Cleanup);
@@ -122,7 +124,7 @@ public sealed class DashboardPage : AppPage
         actionPanel.Controls.Add(cleanupButton);
         hero.Resize += (_, _) =>
         {
-            actionPanel.Location = new Point(hero.ClientSize.Width - 234, 68);
+            actionPanel.Location = new Point(Math.Max(300, hero.ClientSize.Width - 234), 52);
             var textWidth = Math.Max(360, actionPanel.Left - 76);
             _machineLabel.Width = textWidth;
             _systemLabel.Width = textWidth;
@@ -139,9 +141,10 @@ public sealed class DashboardPage : AppPage
             Width = 980,
             AutoSize = true,
             AutoSizeMode = AutoSizeMode.GrowAndShrink,
-            WrapContents = true,
+            WrapContents = false,
             BackColor = Theme.Canvas,
-            Margin = new Padding(0, 0, 0, 24)
+            Margin = new Padding(0, 0, 0, 18),
+            Height = 168
         };
         _processorCard = new MetricCard("\uE950", "\u5904\u7406\u5668");
         _memoryCard = new MetricCard("\uEDA2", "\u5185\u5b58");
@@ -166,35 +169,37 @@ public sealed class DashboardPage : AppPage
         var panel = new SurfacePanel
         {
             Width = 980,
-            Height = 280,
-            Padding = new Padding(30),
+            Height = 252,
+            Padding = new Padding(26),
             SurfaceStyle = SurfaceStyle.Raised,
-            Margin = new Padding(0, 0, 0, 20)
+            Margin = new Padding(0, 0, 0, 18)
         };
-        panel.Controls.Add(new Label
+        panel.Controls.Add(new BufferedLabel
         {
-            Text = "\u5feb\u901f\u4e0a\u624b",
+            Text = "快速上手",
             Font = Theme.DisplayFont(15, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
-            AutoSize = true,
-            Location = new Point(30, 26),
+            TextAlign = ContentAlignment.MiddleLeft,
+            Size = new Size(220, 32),
+            Location = new Point(26, 18),
             BackColor = Color.Transparent
         });
-        panel.Controls.Add(new Label
+        panel.Controls.Add(new BufferedLabel
         {
-            Text = "\u4e09\u6b65\u5b8c\u6210\u4e00\u6b21\u5b89\u5168\u7ef4\u62a4\u3002",
+            Text = "三步完成一次安全维护。",
             Font = Theme.Font(9.5f),
             ForeColor = Theme.TextSecondary,
-            AutoSize = true,
-            Location = new Point(31, 60),
+            TextAlign = ContentAlignment.MiddleLeft,
+            Size = new Size(360, 24),
+            Location = new Point(27, 48),
             BackColor = Color.Transparent
         });
         var rows = new TableLayoutPanel
         {
             ColumnCount = 1,
             RowCount = 3,
-            Location = new Point(30, 100),
-            Size = new Size(920, 148),
+            Location = new Point(26, 78),
+            Size = new Size(920, 150),
             BackColor = Color.Transparent,
             Margin = new Padding(0),
             Padding = new Padding(0)
@@ -223,7 +228,7 @@ public sealed class DashboardPage : AppPage
             Cursor = Cursors.Hand,
             Radius = Theme.RadiusMd
         };
-        var number = new Label
+        var number = new BufferedLabel
         {
             Text = index.ToString("00"),
             Font = Theme.MonoFont(9, FontStyle.Bold),
@@ -233,25 +238,27 @@ public sealed class DashboardPage : AppPage
             TextAlign = ContentAlignment.MiddleLeft,
             BackColor = Color.Transparent
         };
-        var text = new Label
+        var text = new BufferedLabel
         {
             Text = title,
             Font = Theme.Font(10.5f, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
             Location = new Point(68, 12),
-            Size = new Size(240, 30),
+            Size = new Size(240, 34),
+            TextAlign = ContentAlignment.MiddleLeft,
             BackColor = Color.Transparent
         };
-        var detail = new Label
+        var detail = new BufferedLabel
         {
             Text = description,
             Font = Theme.Font(9.2f),
             ForeColor = Theme.TextSecondary,
-            Location = new Point(310, 13),
-            Size = new Size(500, 30),
+            Location = new Point(310, 11),
+            Size = new Size(500, 34),
+            TextAlign = ContentAlignment.MiddleLeft,
             BackColor = Color.Transparent
         };
-        var arrow = new Label
+        var arrow = new BufferedLabel
         {
             Text = "\uE72A",
             Font = Theme.IconFont(11),
@@ -263,7 +270,7 @@ public sealed class DashboardPage : AppPage
         };
         row.Resize += (_, _) =>
         {
-            arrow.Location = new Point(row.ClientSize.Width - 56, 13);
+            arrow.Location = new Point(row.ClientSize.Width - 56, 11);
             detail.Width = Math.Max(160, arrow.Left - detail.Left - 20);
         };
         void Navigate(object? _, EventArgs __) => _navigate(route);
@@ -306,8 +313,9 @@ public sealed class DashboardPage : AppPage
     {
         var cleaned = processor.Replace("(R)", string.Empty, StringComparison.OrdinalIgnoreCase)
             .Replace("(TM)", string.Empty, StringComparison.OrdinalIgnoreCase)
+            .Replace("Processor", string.Empty, StringComparison.OrdinalIgnoreCase)
             .Trim();
-        return cleaned.Length > 28 ? cleaned[..28] + "\u2026" : cleaned;
+        return cleaned;
     }
 
     private static void SetPill(StatusPill pill, string text, Color color)
@@ -331,11 +339,25 @@ public sealed class DashboardPage : AppPage
         if (metricsRow is FlowLayoutPanel row && row.Controls.Count > 0)
         {
             var gap = 12;
-            var cardWidth = (row.ClientSize.Width - (row.Controls.Count - 1) * gap) / row.Controls.Count;
-            foreach (Control card in row.Controls)
+            var availableWidth = Math.Max(640, width);
+            var narrow = availableWidth < 900;
+            row.WrapContents = narrow;
+            var cardHeight = narrow ? 154 : 168;
+            row.Height = narrow ? (cardHeight * 2) + gap : cardHeight;
+            var columns = narrow ? 2 : row.Controls.Count;
+            var cardWidth = Math.Max(200,
+                (availableWidth - ((columns - 1) * gap)) / columns);
+            for (var index = 0; index < row.Controls.Count; index++)
             {
-                card.Width = Math.Max(160, cardWidth);
-                card.Margin = new Padding(0, 0, gap, 0);
+                row.Controls[index].Width = cardWidth;
+                row.Controls[index].Height = cardHeight;
+                var column = index % columns;
+                var rowIndex = index / columns;
+                row.Controls[index].Margin = new Padding(
+                    0,
+                    0,
+                    column == columns - 1 ? 0 : gap,
+                    narrow && rowIndex == 0 ? gap : 0);
             }
         }
     }

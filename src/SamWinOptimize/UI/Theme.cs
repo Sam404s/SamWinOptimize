@@ -4,41 +4,50 @@ namespace SamWinOptimize.UI;
 
 /// <summary>
 /// Design tokens for the SamWinOptimize visual system.
-/// Palette: fresh blue-slate, airy spacing, soft borders.
+/// Direction: light macOS utility, quiet surfaces, restrained blue accents.
 /// </summary>
 internal static class Theme
 {
-    // ── Backgrounds ──────────────────────────────────────────────
-    public static readonly Color Canvas = Color.FromArgb(248, 250, 252);       // #F8FAFC
-    public static readonly Color CanvasSoft = Color.FromArgb(241, 245, 249);   // #F1F5F9
-    public static readonly Color Sidebar = Color.FromArgb(255, 255, 255);      // #FFFFFF
-    public static readonly Color SidebarRaised = Color.FromArgb(248, 250, 252);// #F8FAFC
-    public static readonly Color Surface = Color.FromArgb(255, 255, 255);      // #FFFFFF
-    public static readonly Color SurfaceRaised = Color.FromArgb(248, 250, 252);// #F8FAFC
-    public static readonly Color SurfaceHover = Color.FromArgb(241, 245, 249); // #F1F5F9
-    public static readonly Color SurfaceStrong = Color.FromArgb(226, 232, 240);// #E2E8F0
+    // ── macOS-inspired canvas ────────────────────────────────────
+    public static readonly Color Canvas = Color.FromArgb(246, 246, 248);       // #F6F6F8
+    public static readonly Color CanvasSoft = Color.FromArgb(239, 239, 244);   // #EFEFF4
+    public static readonly Color CanvasRaised = Color.White;                    // #FFFFFF
+    public static readonly Color Sidebar = Color.FromArgb(242, 242, 247);      // #F2F2F7
+    public static readonly Color SidebarRaised = Color.FromArgb(235, 235, 241); // #EBEBF1
+
+    // ── Quiet utility surfaces ───────────────────────────────────
+    public static readonly Color Surface = Color.White;                         // #FFFFFF
+    public static readonly Color SurfaceRaised = Color.White;                    // #FFFFFF
+    public static readonly Color SurfaceHover = Color.FromArgb(242, 246, 252); // #F2F6FC
+    public static readonly Color SurfaceStrong = Color.FromArgb(231, 233, 238); // #E7E9EE
+    public static readonly Color GlassTop = Color.White;
+    public static readonly Color GlassBottom = Color.FromArgb(250, 250, 252);
+    public static readonly Color GlassHighlight = Color.White;
+    public static readonly Color Shadow = Color.FromArgb(24, 0, 0, 0);
 
     // ── Text ─────────────────────────────────────────────────────
-    public static readonly Color TextPrimary = Color.FromArgb(15, 23, 42);     // #0F172A
-    public static readonly Color TextSecondary = Color.FromArgb(71, 85, 105);  // #475569
-    public static readonly Color TextMuted = Color.FromArgb(148, 163, 184);    // #94A3B8
+    public static readonly Color TextPrimary = Color.FromArgb(29, 29, 31);      // #1D1D1F
+    public static readonly Color TextSecondary = Color.FromArgb(91, 95, 105);  // #5B5F69
+    public static readonly Color TextMuted = Color.FromArgb(142, 142, 147);    // #8E8E93
 
     // ── Borders ──────────────────────────────────────────────────
-    public static readonly Color Border = Color.FromArgb(226, 232, 240);       // #E2E8F0
-    public static readonly Color BorderStrong = Color.FromArgb(203, 213, 225); // #CBD5E1
+    public static readonly Color Border = Color.FromArgb(218, 218, 224);        // #DADAE0
+    public static readonly Color BorderStrong = Color.FromArgb(194, 195, 202);  // #C2C3CA
+    public static readonly Color BorderGlow = Color.FromArgb(94, 156, 219);     // #5E9CDB
 
-    // ── Accent (clean blue) ─────────────────────────────────────
-    public static readonly Color Accent = Color.FromArgb(59, 130, 246);        // #3B82F6
-    public static readonly Color AccentStrong = Color.FromArgb(37, 99, 235);   // #2563EB
-    public static readonly Color AccentWash = Color.FromArgb(239, 246, 255);   // #EFF6FF
-    public static readonly Color AccentSoft = Color.FromArgb(191, 219, 254);   // #BFDBFE
+    // ── Accent: calm system blue ─────────────────────────────────
+    public static readonly Color Accent = Color.FromArgb(10, 132, 255);         // #0A84FF
+    public static readonly Color AccentStrong = Color.FromArgb(0, 112, 232);    // #0070E8
+    public static readonly Color AccentWash = Color.FromArgb(232, 242, 255);    // #E8F2FF
+    public static readonly Color AccentSoft = Color.FromArgb(74, 145, 224);     // #4A91E0
+    public static readonly Color AccentDeep = Color.FromArgb(0, 88, 190);       // #0058BE
 
     // ── Semantic ─────────────────────────────────────────────────
-    public static readonly Color Success = Color.FromArgb(16, 185, 129);       // #10B981
-    public static readonly Color Warning = Color.FromArgb(245, 158, 11);       // #F59E0B
-    public static readonly Color Danger = Color.FromArgb(239, 68, 68);         // #EF4444
-    public static readonly Color DangerSurface = Color.FromArgb(254, 242, 242);// #FEF2F2
-    public static readonly Color Info = Color.FromArgb(99, 102, 241);          // #6366F1
+    public static readonly Color Success = Color.FromArgb(38, 142, 91);         // #268E5B
+    public static readonly Color Warning = Color.FromArgb(177, 116, 20);       // #B17414
+    public static readonly Color Danger = Color.FromArgb(207, 67, 67);          // #CF4343
+    public static readonly Color DangerSurface = Color.FromArgb(253, 238, 238); // #FDEEEE
+    public static readonly Color Info = Color.FromArgb(96, 86, 164);            // #6056A4
 
     // ── Spacing tokens ───────────────────────────────────────────
     public const int SpacingXs = 4;
@@ -51,8 +60,8 @@ internal static class Theme
     // ── Radius tokens ────────────────────────────────────────────
     public const int RadiusSm = 8;
     public const int RadiusMd = 12;
-    public const int RadiusLg = 16;
-    public const int RadiusXl = 20;
+    public const int RadiusLg = 18;
+    public const int RadiusXl = 24;
 
     // ── Typography ───────────────────────────────────────────────
     public static Font Font(float size, FontStyle style = FontStyle.Regular) =>
@@ -117,6 +126,7 @@ internal static class Theme
             ForeColor = TextSecondary,
             Font = Font(8.8f, FontStyle.Bold),
             SelectionBackColor = CanvasSoft,
+            SelectionForeColor = TextSecondary,
             Padding = new Padding(18, 0, 18, 0)
         };
         grid.DefaultCellStyle = new DataGridViewCellStyle
@@ -129,7 +139,7 @@ internal static class Theme
         };
         grid.AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
         {
-            BackColor = CanvasSoft,
+            BackColor = SurfaceRaised,
             ForeColor = TextPrimary,
             SelectionBackColor = AccentWash,
             SelectionForeColor = TextPrimary,
@@ -141,7 +151,7 @@ internal static class Theme
     {
         input.Font = Font(10);
         input.ForeColor = TextPrimary;
-        input.BackColor = Surface;
+        input.BackColor = SurfaceRaised;
         input.BorderStyle = BorderStyle.FixedSingle;
         input.Margin = new Padding(0);
     }
@@ -150,16 +160,16 @@ internal static class Theme
     {
         input.Font = Font(9.5f);
         input.ForeColor = TextPrimary;
-        input.BackColor = Surface;
+        input.BackColor = SurfaceRaised;
         input.FlatStyle = FlatStyle.Flat;
         input.Margin = new Padding(0);
     }
 
     public static string RiskLabel(Models.RiskLevel risk) => risk switch
     {
-        Models.RiskLevel.Low => "\u4f4e\u98ce\u9669",
-        Models.RiskLevel.Medium => "\u9700\u786e\u8ba4",
-        Models.RiskLevel.High => "\u9ad8\u98ce\u9669",
+        Models.RiskLevel.Low => "低风险",
+        Models.RiskLevel.Medium => "需确认",
+        Models.RiskLevel.High => "高风险",
         _ => throw new ArgumentOutOfRangeException(nameof(risk))
     };
 

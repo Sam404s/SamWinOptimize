@@ -5,9 +5,9 @@ namespace SamWinOptimize.UI.Controls;
 
 public sealed class TaskCard : SurfacePanel
 {
-    private readonly CheckBox _checkBox;
-    private readonly Label _titleLabel;
-    private readonly Label _descriptionLabel;
+    private readonly SelectionCheckBox _checkBox;
+    private readonly BufferedLabel _titleLabel;
+    private readonly BufferedLabel _descriptionLabel;
     private readonly BufferedFlowLayoutPanel _tags;
 
     public TaskCard(
@@ -27,7 +27,7 @@ public sealed class TaskCard : SurfacePanel
         Padding = new Padding(24, 18, 24, 18);
         Hoverable = true;
 
-        _checkBox = new CheckBox
+        _checkBox = new SelectionCheckBox
         {
             Checked = selected,
             AutoSize = false,
@@ -46,10 +46,10 @@ public sealed class TaskCard : SurfacePanel
             SelectionChanged?.Invoke(this, EventArgs.Empty);
         };
 
-        _titleLabel = new Label
+        _titleLabel = new BufferedLabel
         {
             Text = title,
-            Font = Theme.Font(11.5f, FontStyle.Bold),
+            Font = Theme.Font(11.2f, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
             Location = new Point(78, 22),
             Size = new Size(520, 30),
@@ -57,10 +57,10 @@ public sealed class TaskCard : SurfacePanel
             BackColor = Color.Transparent
         };
 
-        _descriptionLabel = new Label
+        _descriptionLabel = new BufferedLabel
         {
             Text = description,
-            Font = Theme.Font(9.5f),
+            Font = Theme.Font(9.2f),
             ForeColor = Theme.TextSecondary,
             Location = new Point(78, 58),
             Size = new Size(620, 48),
@@ -71,10 +71,10 @@ public sealed class TaskCard : SurfacePanel
         _tags = new BufferedFlowLayoutPanel
         {
             Dock = DockStyle.Right,
-            Width = 310,
+            Width = 258,
             FlowDirection = FlowDirection.RightToLeft,
             WrapContents = true,
-            Padding = new Padding(4, 26, 4, 4),
+            Padding = new Padding(0, 23, 0, 0),
             BackColor = Color.Transparent
         };
         _tags.Controls.Add(new StatusPill(Theme.RiskLabel(risk), Theme.RiskColor(risk)));

@@ -12,6 +12,7 @@ public sealed class CleanupPage : AppPage
     private readonly Panel _taskList;
     private readonly Label _selectionLabel;
     private readonly ActionButton _runButton;
+    private bool _isLayingOutCommandDeck;
 
     public CleanupPage(CommandRunner commandRunner, ReceiptStore receiptStore)
         : base("\uE74D", "\u7a7a\u95f4\u6e05\u7406", "\u4f18\u5148\u5904\u7406\u53ef\u5b89\u5168\u56de\u6536\u7684\u7f13\u5b58\uff0c\u91ca\u653e\u7a7a\u95f4\u4e14\u98ce\u9669\u53ef\u63a7\u3002")
@@ -44,61 +45,86 @@ public sealed class CleanupPage : AppPage
         var commandDeck = new SurfacePanel
         {
             Dock = DockStyle.Top,
-            Height = 124,
+            Height = 118,
             SurfaceStyle = SurfaceStyle.Accent,
-            Padding = new Padding(30),
+            Padding = new Padding(24, 20, 24, 20),
             Radius = Theme.RadiusLg
         };
-        var noticeIcon = new Label
+        var commandLayout = new BufferedTableLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            BackColor = Color.Transparent,
+            Margin = new Padding(0),
+            Padding = new Padding(0),
+            ColumnCount = 4,
+            RowCount = 1,
+            // AddRows is intentionally used for a dynamically reconfigured
+            // command deck. It prevents WinForms from throwing while the
+            // responsive cell map is being rebuilt during a resize.
+            GrowStyle = TableLayoutPanelGrowStyle.AddRows
+        };
+        var noticeIcon = new BufferedLabel
         {
             Text = "\uE74D",
-            Font = Theme.IconFont(17),
+            Font = Theme.IconFont(19),
             ForeColor = Theme.Accent,
-            Location = new Point(30, 28),
-            Size = new Size(38, 38),
+            Dock = DockStyle.Fill,
             BackColor = Color.Transparent,
-            TextAlign = ContentAlignment.MiddleLeft
+            TextAlign = ContentAlignment.MiddleCenter
         };
-        var noticeTitle = new Label
+        var noticeTitle = new BufferedLabel
         {
             Text = "\u672c\u5730\u7f13\u5b58\u6e05\u7406",
             Font = Theme.DisplayFont(13.5f, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
-            AutoSize = true,
-            Location = new Point(78, 26),
-            BackColor = Color.Transparent
+            Dock = DockStyle.Top,
+            Height = 30,
+            BackColor = Color.Transparent,
+            TextAlign = ContentAlignment.MiddleLeft
         };
-        var noticeText = new Label
+        var noticeText = new BufferedLabel
         {
             Text = "\u9ed8\u8ba4\u4e0d\u9009\u62e9\u56de\u6536\u7ad9\u3001\u4e0d\u8f6c\u79fb\u4e2a\u4eba\u5b58\u50a8\uff0c\u5220\u9664\u524d\u5148\u68c0\u67e5\u3002",
             Font = Theme.Font(9.5f),
             ForeColor = Theme.TextSecondary,
-            AutoEllipsis = true,
-            Location = new Point(79, 60),
-            Size = new Size(560, 38),
-            BackColor = Color.Transparent
+            AutoSize = false,
+            AutoEllipsis = false,
+            WordWrap = true,
+            Dock = DockStyle.Fill,
+            BackColor = Color.Transparent,
+            TextAlign = ContentAlignment.TopLeft
         };
-        _selectionLabel = new Label
+        var noticeContent = new BufferedPanel
+        {
+            Dock = DockStyle.Fill,
+            BackColor = Color.Transparent,
+            Margin = new Padding(10, 0, 12, 0),
+            Padding = new Padding(0)
+        };
+        noticeContent.Controls.Add(noticeText);
+        noticeContent.Controls.Add(noticeTitle);
+        _selectionLabel = new BufferedLabel
         {
             Font = Theme.Font(9.5f, FontStyle.Bold),
             ForeColor = Theme.TextSecondary,
+            AutoSize = false,
+            AutoEllipsis = false,
             TextAlign = ContentAlignment.MiddleRight,
-            Size = new Size(196, 36),
+            Dock = DockStyle.Fill,
+            Padding = new Padding(0, 0, 10, 0),
             BackColor = Color.Transparent
         };
         _runButton = new ActionButton
         {
             Text = "\u5f00\u59cb\u6e05\u7406",
             Kind = ActionButtonKind.Primary,
-            Size = new Size(150, 50)
+            Dock = DockStyle.Fill,
+            MinimumSize = new Size(140, 48),
+            Margin = new Padding(0, 4, 0, 4)
         };
         _runButton.Click += async (_, _) => await RunCleanupAsync();
-        commandDeck.Resize += (_, _) => LayoutCommandDeck(commandDeck, noticeText);
-        commandDeck.Controls.Add(noticeIcon);
-        commandDeck.Controls.Add(noticeTitle);
-        commandDeck.Controls.Add(noticeText);
-        commandDeck.Controls.Add(_selectionLabel);
-        commandDeck.Controls.Add(_runButton);
+        commandDeck.Controls.Add(commandLayout);
+        commandDeck.Resize += (_, _) => LayoutCommandDeck(commandDeck, commandLayout, noticeIcon, noticeContent, noticeText);
 
         _taskList = new BufferedScrollablePanel
         {
@@ -109,30 +135,82 @@ public sealed class CleanupPage : AppPage
         };
         Body.Controls.Add(_taskList);
         Body.Controls.Add(commandDeck);
-        LayoutCommandDeck(commandDeck, noticeText);
+        LayoutCommandDeck(commandDeck, commandLayout, noticeIcon, noticeContent, noticeText);
         RenderTasks();
     }
 
-    private void LayoutCommandDeck(Control commandDeck, Label noticeText)
+    private void LayoutCommandDeck(
+        SurfacePanel commandDeck,
+        BufferedTableLayoutPanel commandLayout,
+        BufferedLabel noticeIcon,
+        BufferedPanel noticeContent,
+        Label noticeText)
     {
+        if (_isLayingOutCommandDeck)
+        {
+            return;
+        }
+
+        _isLayingOutCommandDeck = true;
         var compact = commandDeck.ClientSize.Width < 900;
-        commandDeck.Height = compact ? 168 : 124;
-        if (compact)
+        commandLayout.SuspendLayout();
+        try
         {
-            noticeText.Width = Math.Max(420, commandDeck.ClientSize.Width - 120);
-            _selectionLabel.Location = new Point(30, 116);
-            _selectionLabel.TextAlign = ContentAlignment.MiddleLeft;
-            _selectionLabel.Width = Math.Max(220, commandDeck.ClientSize.Width - 230);
-            _runButton.Location = new Point(commandDeck.ClientSize.Width - 176, 106);
+            commandDeck.Height = compact ? 158 : 118;
+
+            // Rebuild the table while it tolerates transient cell positions.
+            // The layout is resized repeatedly, so AddRows is kept active for
+            // the whole lifecycle instead of briefly switching to FixedSize.
+            commandLayout.GrowStyle = TableLayoutPanelGrowStyle.AddRows;
+            commandLayout.Controls.Clear();
+            commandLayout.RowStyles.Clear();
+            commandLayout.ColumnStyles.Clear();
+
+            if (compact)
+            {
+                commandLayout.RowCount = 2;
+                commandLayout.ColumnCount = 3;
+                commandLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+                commandLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36));
+                commandLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 44));
+                commandLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+                commandLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 144));
+
+                commandLayout.Controls.Add(noticeIcon, 0, 0);
+                commandLayout.SetRowSpan(noticeIcon, 2);
+                commandLayout.Controls.Add(noticeContent, 1, 0);
+                commandLayout.Controls.Add(_runButton, 2, 0);
+                commandLayout.Controls.Add(_selectionLabel, 1, 1);
+                commandLayout.SetColumnSpan(_selectionLabel, 2);
+                _selectionLabel.TextAlign = ContentAlignment.MiddleLeft;
+                _selectionLabel.Padding = new Padding(0, 0, 0, 0);
+            }
+            else
+            {
+                commandLayout.RowCount = 1;
+                commandLayout.ColumnCount = 4;
+                commandLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+                commandLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 44));
+                commandLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+                commandLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 210));
+                commandLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 154));
+
+                commandLayout.Controls.Add(noticeIcon, 0, 0);
+                commandLayout.Controls.Add(noticeContent, 1, 0);
+                commandLayout.Controls.Add(_selectionLabel, 2, 0);
+                commandLayout.Controls.Add(_runButton, 3, 0);
+                _selectionLabel.TextAlign = ContentAlignment.MiddleRight;
+                _selectionLabel.Padding = new Padding(0, 0, 12, 0);
+            }
         }
-        else
+        finally
         {
-            _runButton.Location = new Point(commandDeck.ClientSize.Width - 176, 37);
-            _selectionLabel.Location = new Point(_runButton.Left - 212, 44);
-            _selectionLabel.TextAlign = ContentAlignment.MiddleRight;
-            _selectionLabel.Width = 196;
-            noticeText.Width = Math.Max(320, _selectionLabel.Left - noticeText.Left - 28);
+            commandLayout.ResumeLayout(true);
+            _isLayingOutCommandDeck = false;
         }
+
+        noticeText.Invalidate();
+        commandLayout.Invalidate(true);
     }
 
     private void RenderTasks()

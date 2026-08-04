@@ -12,7 +12,7 @@ internal static class SecurityPageLayout
             Width = 980,
             Height = height,
             Margin = new Padding(0, 0, 0, 24),
-            Padding = new Padding(30),
+            Padding = Padding.Empty,
             SurfaceStyle = SurfaceStyle.Raised,
             Radius = Theme.RadiusLg
         };
@@ -24,7 +24,7 @@ internal static class SecurityPageLayout
             Location = new Point(30, 30),
             Padding = new Padding(1)
         };
-        iconTile.Controls.Add(new Label
+        iconTile.Controls.Add(new BufferedLabel
         {
             Text = glyph,
             Font = Theme.IconFont(19),
@@ -33,49 +33,75 @@ internal static class SecurityPageLayout
             TextAlign = ContentAlignment.MiddleCenter,
             Dock = DockStyle.Fill
         });
-        var titleLabel = new Label
+        var titleLabel = new BufferedLabel
         {
             Text = title,
             Font = Theme.DisplayFont(14.5f, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
-            AutoSize = true,
-            Location = new Point(110, 28),
+            AutoSize = false,
+            AutoEllipsis = false,
+            TextAlign = ContentAlignment.MiddleLeft,
+            Location = new Point(110, 24),
+            Size = new Size(700, 38),
             BackColor = Color.Transparent
         };
-        var descriptionLabel = new Label
+        var descriptionLabel = new BufferedLabel
         {
             Text = description,
             Font = Theme.Font(9.5f),
             ForeColor = Theme.TextSecondary,
-            AutoEllipsis = true,
+            AutoSize = false,
+            AutoEllipsis = false,
+            WordWrap = true,
+            TextAlign = ContentAlignment.TopLeft,
             Location = new Point(111, 62),
-            Size = new Size(690, 36),
+            Size = new Size(690, 46),
             BackColor = Color.Transparent
         };
         card.Controls.Add(iconTile);
         card.Controls.Add(titleLabel);
         card.Controls.Add(descriptionLabel);
-        card.Resize += (_, _) => descriptionLabel.Width = Math.Max(320, card.ClientSize.Width - 340);
+        card.Resize += (_, _) =>
+        {
+            var textWidth = Math.Max(300, card.ClientSize.Width - 142);
+            titleLabel.Width = textWidth;
+            descriptionLabel.Width = textWidth;
+        };
         return card;
     }
 
-    public static Label CreateStatusLabel(Point location, Size size) => new()
+    public static BufferedLabel CreateStatusLabel(Point location, Size size) => new()
     {
-        Text = "\u6b63\u5728\u68c0\u6d4b\u2026",
+        Text = "正在检测…",
         Font = Theme.Font(9.5f, FontStyle.Bold),
         ForeColor = Theme.Info,
-        AutoEllipsis = true,
+        AutoSize = false,
+        AutoEllipsis = false,
+        WordWrap = true,
+        TextAlign = ContentAlignment.TopLeft,
         Location = location,
         Size = size,
         BackColor = Color.Transparent
     };
 
-    public static Label CreateFixedStatus(string text, Color color)
+    public static BufferedLabel CreateFixedStatus(string text, Color color)
     {
-        var label = CreateStatusLabel(new Point(110, 114), new Size(620, 32));
+        var label = CreateStatusLabel(new Point(110, 114), new Size(430, 38));
         label.Text = text;
         label.ForeColor = color;
         return label;
+    }
+
+    public static void FitStatus(
+        Control card,
+        BufferedLabel status,
+        int top,
+        int reservedBottom = 22,
+        int reservedRight = 0)
+    {
+        var width = Math.Max(300, card.ClientSize.Width - 142 - reservedRight);
+        status.Location = new Point(110, top);
+        status.Size = new Size(width, Math.Max(28, card.ClientSize.Height - top - reservedBottom));
     }
 
     public static void AddLauncherButton(Control card, string text, string target, int top)
@@ -84,11 +110,11 @@ internal static class SecurityPageLayout
         {
             Text = text,
             Kind = ActionButtonKind.Secondary,
-            Size = new Size(190, 48),
+            Size = new Size(190, 46),
             Anchor = AnchorStyles.Top | AnchorStyles.Right
         };
         card.Resize += (_, _) =>
-            button.Location = new Point(card.ClientSize.Width - 224, top);
+            button.Location = new Point(Math.Max(110, card.ClientSize.Width - button.Width - 30), top);
         button.Click += (_, _) => SettingsLauncher.Open(target);
         card.Controls.Add(button);
     }

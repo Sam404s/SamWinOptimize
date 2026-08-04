@@ -12,6 +12,10 @@ public enum SurfaceStyle
     Danger
 }
 
+/// <summary>
+/// Reusable light utility surface. The control keeps depth subtle so the shell
+/// reads like a native desktop workspace rather than a stack of dark cards.
+/// </summary>
 public class SurfacePanel : Panel
 {
     private int _radius = Theme.RadiusLg;
@@ -107,34 +111,36 @@ public class SurfacePanel : Panel
         base.OnControlAdded(eventArgs);
     }
 
-    protected override void OnResize(EventArgs eventArgs)
-    {
-        base.OnResize(eventArgs);
-    }
-
     protected override void OnPaintBackground(PaintEventArgs eventArgs)
     {
-        eventArgs.Graphics.Clear(ResolveParentBackColor());
-        eventArgs.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-        var bounds = new Rectangle(0, 0, Math.Max(1, Width - 1), Math.Max(1, Height - 1));
-        using var path = Theme.RoundedRectangle(bounds, Radius);
-        var fillColor = ResolveFill();
-        var borderColor = _hovered ? Theme.BorderStrong : ResolveBorder();
-        using var background = new SolidBrush(fillColor);
-        using var border = new Pen(borderColor);
-        eventArgs.Graphics.FillPath(background, path);
-        eventArgs.Graphics.DrawPath(border, path);
+        var graphics = eventArgs.Graphics;
+        graphics.Clear(ResolveParentBackColor());
+        graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        graphics.CompositingMode = CompositingMode.SourceOver;
 
-        // Subtle inner highlight for depth
-        var highlightBounds = new Rectangle(1, 1, Math.Max(1, Width - 3), Math.Max(1, Height - 3));
-        using var highlightPath = Theme.RoundedRectangle(highlightBounds, Math.Max(6, Radius - 1));
-        using var highlightPen = new Pen(Color.FromArgb(18, Color.White));
-        eventArgs.Graphics.DrawPath(highlightPen, highlightPath);
+        var bounds = new Rectangle(1, 1, Math.Max(1, Width - 3), Math.Max(1, Height - 3));
+        using var path = Theme.RoundedRectangle(bounds, Radius);
+
+        // A compact shadow keeps the panel separated from the light canvas.
+        var shadowBounds = new Rectangle(bounds.X + 1, bounds.Y + 5, bounds.Width, bounds.Height);
+        using var shadowPath = Theme.RoundedRectangle(shadowBounds, Radius);
+        using var shadowBrush = new SolidBrush(Theme.Shadow);
+        graphics.FillPath(shadowBrush, shadowPath);
+
+        var fill = ResolveFill();
+        using (var surfaceBrush = new SolidBrush(fill))
+        {
+            graphics.FillPath(surfaceBrush, path);
+        }
+
+        var borderColor = _hovered ? Theme.BorderGlow : ResolveBorder();
+        using var border = new Pen(borderColor, _hovered ? 1.25f : 1f);
+        graphics.DrawPath(border, path);
 
         if (AccentEdge || SurfaceStyle == SurfaceStyle.Accent)
         {
-            using var accentBorder = new Pen(Theme.AccentSoft, 1.5f);
-            eventArgs.Graphics.DrawPath(accentBorder, path);
+            using var accentPen = new Pen(Theme.AccentSoft, 1.35f);
+            graphics.DrawPath(accentPen, path);
         }
     }
 
@@ -144,17 +150,17 @@ public class SurfacePanel : Panel
         {
             SurfaceStyle.Raised => Theme.SurfaceRaised,
             SurfaceStyle.Quiet => Theme.CanvasSoft,
-            SurfaceStyle.Accent => Theme.Surface,
-            SurfaceStyle.Danger => Theme.Blend(Theme.Surface, Theme.DangerSurface, 0.42f),
+            SurfaceStyle.Accent => Theme.AccentWash,
+            SurfaceStyle.Danger => Theme.Blend(Theme.Surface, Theme.DangerSurface, 0.62f),
             _ => Theme.Surface
         };
-        return _hovered ? Theme.Blend(fill, Theme.SurfaceHover, 0.48f) : fill;
+        return _hovered ? Theme.Blend(fill, Theme.SurfaceHover, 0.34f) : fill;
     }
 
     private Color ResolveBorder() => SurfaceStyle switch
     {
         SurfaceStyle.Accent => Theme.AccentSoft,
-        SurfaceStyle.Danger => Theme.Blend(Theme.Border, Theme.Danger, 0.45f),
+        SurfaceStyle.Danger => Theme.Blend(Theme.Border, Theme.Danger, 0.65f),
         SurfaceStyle.Raised => Theme.BorderStrong,
         _ => Theme.Border
     };

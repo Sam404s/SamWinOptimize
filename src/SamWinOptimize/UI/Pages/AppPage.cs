@@ -10,7 +10,7 @@ public abstract class AppPage : UserControl
         AccessibleName = title;
         AccessibleDescription = description;
         BackColor = Theme.Canvas;
-        Padding = new Padding(44, 34, 44, 38);
+        Padding = new Padding(32, 28, 32, 30);
 
         Header = new PageHeader(glyph, title, description);
         Body = new BufferedPanel
@@ -18,7 +18,7 @@ public abstract class AppPage : UserControl
             Dock = DockStyle.Fill,
             AutoScroll = allowBodyScroll,
             BackColor = Theme.Canvas,
-            Padding = new Padding(0, 6, allowBodyScroll ? 14 : 0, 0)
+            Padding = new Padding(0, 14, allowBodyScroll ? 14 : 0, 0)
         };
 
         Controls.Add(Body);

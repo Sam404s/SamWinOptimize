@@ -21,8 +21,8 @@ public sealed class MainForm : Form
     {
         Text = "SamWinOptimize";
         StartPosition = FormStartPosition.CenterScreen;
-        Size = new Size(1440, 920);
-        MinimumSize = new Size(1180, 760);
+        Size = new Size(1520, 960);
+        MinimumSize = new Size(1240, 800);
         BackColor = Theme.Canvas;
         ForeColor = Theme.TextPrimary;
         Font = Theme.Font(9.5f);
@@ -42,17 +42,17 @@ public sealed class MainForm : Form
             Padding = new Padding(0),
             BackColor = Theme.Canvas
         };
-        shell.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 320));
+        shell.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 344));
         shell.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
         var sidebar = BuildSidebar();
-        var workspace = new BufferedPanel
+        var workspace = new BackdropPanel
         {
             Dock = DockStyle.Fill,
             BackColor = Theme.Canvas,
             Padding = new Padding(0)
         };
-        _pageHost = new BufferedPanel
+        _pageHost = new BackdropPanel
         {
             Dock = DockStyle.Fill,
             BackColor = Theme.Canvas
@@ -69,17 +69,18 @@ public sealed class MainForm : Form
 
     private Panel BuildSidebar()
     {
-        var sidebar = new BufferedPanel
+        var sidebar = new BackdropPanel
         {
             Dock = DockStyle.Fill,
             BackColor = Theme.Sidebar,
-            Padding = new Padding(24, 0, 24, 28)
+            SidebarMode = true,
+            Padding = new Padding(28, 0, 28, 28)
         };
         var brand = BuildBrand();
         var nav = new BufferedFlowLayoutPanel
         {
             Dock = DockStyle.Top,
-            AutoSize = true,
+            AutoSize = false,
             AutoSizeMode = AutoSizeMode.GrowAndShrink,
             FlowDirection = FlowDirection.TopDown,
             WrapContents = false,
@@ -103,18 +104,31 @@ public sealed class MainForm : Form
 
         void UpdateSidebarDensity()
         {
-            var compact = sidebar.ClientSize.Height < 780;
-            brand.Height = compact ? 108 : 140;
-            permissionCard.Height = compact ? 112 : 140;
+            var availableHeight = Math.Max(0, sidebar.ClientSize.Height - sidebar.Padding.Vertical);
+            var compact = availableHeight < 720;
+            var brandHeight = compact ? 96 : 124;
+            var permissionHeight = compact ? 122 : 144;
+            var navHeight = Math.Max(1, availableHeight - brandHeight - permissionHeight);
+            var gap = compact ? 2 : 6;
+            var itemHeight = Math.Clamp(
+                (navHeight - (gap * Math.Max(0, nav.Controls.Count - 1))) / Math.Max(1, nav.Controls.Count),
+                compact ? 42 : 48,
+                compact ? 52 : 60);
+
+            brand.Height = brandHeight;
+            permissionCard.Height = permissionHeight;
+            nav.Height = navHeight;
 
             for (var index = 0; index < nav.Controls.Count; index++)
             {
-                var gap = index == nav.Controls.Count - 1 ? 0 : compact ? 6 : 14;
-                nav.Controls[index].Height = compact ? 56 : 64;
-                nav.Controls[index].Margin = new Padding(0, 0, 0, gap);
+                var button = nav.Controls[index];
+                button.Width = Math.Max(1, nav.ClientSize.Width);
+                button.Height = itemHeight;
+                button.Margin = new Padding(0, 0, 0, index == nav.Controls.Count - 1 ? 0 : gap);
             }
 
             nav.PerformLayout();
+            sidebar.Invalidate(invalidateChildren: true);
         }
 
         sidebar.SizeChanged += (_, _) => UpdateSidebarDensity();
@@ -124,46 +138,61 @@ public sealed class MainForm : Form
 
     private static Panel BuildBrand()
     {
-        var brand = new BufferedPanel
+        var brand = new BackdropPanel
         {
             Dock = DockStyle.Top,
-            Height = 140,
-            BackColor = Theme.Sidebar
+            Height = 132,
+            BackColor = Theme.Sidebar,
+            SidebarMode = true
         };
         var markTile = new SurfacePanel
         {
             SurfaceStyle = SurfaceStyle.Accent,
             Radius = Theme.RadiusLg,
-            Size = new Size(56, 56),
-            Location = new Point(4, 32),
+            Size = new Size(52, 52),
+            Location = new Point(4, 28),
             Padding = new Padding(1)
         };
-        markTile.Controls.Add(new Label
+        markTile.Controls.Add(new BufferedLabel
         {
             Text = "S",
-            Font = Theme.DisplayFont(22, FontStyle.Bold),
-            ForeColor = Color.White,
-            BackColor = Theme.Accent,
+            Font = Theme.DisplayFont(20, FontStyle.Bold),
+            ForeColor = Theme.TextPrimary,
+            AutoSize = false,
+            BackColor = Color.Transparent,
             TextAlign = ContentAlignment.MiddleCenter,
             Dock = DockStyle.Fill
         });
-        var name = new Label
+        var name = new BufferedLabel
         {
-            Text = "SamWinOptimize",
-            Font = Theme.DisplayFont(15.5f, FontStyle.Bold),
+            Text = "SamWin",
+            Font = Theme.DisplayFont(17, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
-            AutoSize = true,
-            Location = new Point(74, 34),
+            AutoEllipsis = true,
+            AutoSize = false,
+            TextAlign = ContentAlignment.MiddleLeft,
+            Location = new Point(72, 26),
+            Size = new Size(216, 34),
             BackColor = Color.Transparent
         };
-        var tagline = new Label
+        var tagline = new BufferedLabel
         {
-            Text = "\u5b89\u5168 \u00b7 \u900f\u660e \u00b7 \u53ef\u8fd8\u539f",
-            Font = Theme.Font(9),
+            Text = "OPTIMIZE  ·  GLASS",
+            Font = Theme.MonoFont(8.2f),
             ForeColor = Theme.TextMuted,
-            AutoSize = true,
-            Location = new Point(76, 64),
+            AutoEllipsis = true,
+            AutoSize = false,
+            TextAlign = ContentAlignment.MiddleLeft,
+            Location = new Point(74, 58),
+            Size = new Size(214, 22),
             BackColor = Color.Transparent
+        };
+        brand.Resize += (_, _) =>
+        {
+            var compact = brand.ClientSize.Height < 120;
+            markTile.Location = new Point(4, compact ? 20 : 28);
+            name.Location = new Point(72, compact ? 18 : 26);
+            tagline.Location = new Point(74, compact ? 50 : 58);
         };
         brand.Controls.Add(markTile);
         brand.Controls.Add(name);
@@ -176,68 +205,86 @@ public sealed class MainForm : Form
         var card = new SurfacePanel
         {
             Dock = DockStyle.Bottom,
-            Height = 140,
-            SurfaceStyle = SurfaceStyle.Quiet,
+            Height = 144,
+            SurfaceStyle = SurfaceStyle.Accent,
             Radius = Theme.RadiusLg,
-            Padding = new Padding(22, 18, 22, 18)
+            Padding = new Padding(18, 14, 18, 14)
         };
-        var glyph = new Label
+        var glyph = new BufferedLabel
         {
             Text = "\uE72E",
             Font = Theme.IconFont(16),
             ForeColor = Theme.Success,
-            Size = new Size(36, 36),
-            Location = new Point(20, 20),
+            Size = new Size(34, 32),
+            Location = new Point(18, 14),
             TextAlign = ContentAlignment.MiddleCenter,
             BackColor = Color.Transparent
         };
-        var title = new Label
+        var title = new BufferedLabel
         {
             Text = "\u672c\u5730\u6267\u884c\u6a21\u5f0f",
             Font = Theme.Font(10, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
-            AutoSize = true,
-            Location = new Point(22, 62),
+            AutoSize = false,
+            TextAlign = ContentAlignment.MiddleLeft,
+            Location = new Point(22, 48),
+            Size = new Size(220, 26),
             BackColor = Color.Transparent
         };
-        var detail = new Label
+        var detail = new BufferedLabel
         {
             Text = "\u6240\u6709\u64cd\u4f5c\u4ec5\u5728\u6b64\u8bbe\u5907\u8fd0\u884c\uff0c\n\u4e0d\u4e0a\u4f20\u4efb\u4f55\u6570\u636e\u5230\u7f51\u7edc\u3002",
             Font = Theme.Font(8.8f),
             ForeColor = Theme.TextSecondary,
-            Location = new Point(22, 88),
-            Size = new Size(220, 48),
+            AutoSize = false,
+            TextAlign = ContentAlignment.MiddleLeft,
+            Location = new Point(22, 76),
+            Size = new Size(220, 42),
             BackColor = Color.Transparent
         };
         card.Controls.Add(glyph);
         card.Controls.Add(title);
         card.Controls.Add(detail);
+        card.Resize += (_, _) =>
+        {
+            var compact = card.ClientSize.Height < 136;
+            glyph.Location = new Point(18, compact ? 12 : 14);
+            title.Location = new Point(22, compact ? 44 : 48);
+            title.Height = compact ? 24 : 26;
+            detail.Location = new Point(22, title.Bottom + 2);
+            detail.Size = new Size(
+                Math.Max(120, card.ClientSize.Width - 44),
+                Math.Max(30, card.ClientSize.Height - detail.Top - 10));
+            detail.Font = Theme.Font(compact ? 8.35f : 8.8f);
+        };
         return card;
     }
 
     private Panel BuildStatusBar()
     {
-        var statusBar = new Panel
+        var statusBar = new BackdropPanel
         {
             Dock = DockStyle.Bottom,
-            Height = 48,
+            Height = 56,
             BackColor = Theme.CanvasSoft,
             Padding = new Padding(32, 0, 32, 0)
         };
-        var privacyStatus = new Label
+        var privacyStatus = new BufferedLabel
         {
             Text = "\u25cf  \u672c\u5730\u6267\u884c  \u00b7  \u8bbe\u5907\u6570\u636e\u4e0d\u79bb\u5f00\u672c\u673a",
             Font = Theme.Font(8.5f, FontStyle.Bold),
             ForeColor = Theme.Success,
+            AutoSize = false,
             Dock = DockStyle.Left,
             Width = 340,
             TextAlign = ContentAlignment.MiddleLeft
         };
-        _routeStatus = new Label
+        _routeStatus = new BufferedLabel
         {
             Text = "\u8bbe\u5907\u603b\u89c8",
             Font = Theme.MonoFont(8),
             ForeColor = Theme.TextMuted,
+            AutoSize = false,
             Dock = DockStyle.Right,
             Width = 340,
             TextAlign = ContentAlignment.MiddleRight
@@ -366,5 +413,3 @@ public sealed class MainForm : Form
         ref int attributeValue,
         int attributeSize);
 }
-
-

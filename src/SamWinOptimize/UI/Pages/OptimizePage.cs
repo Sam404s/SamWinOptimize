@@ -10,9 +10,9 @@ public sealed class OptimizePage : AppPage
     private readonly ReceiptStore _receiptStore;
     private readonly HashSet<string> _selectedIds = [];
     private readonly Panel _taskList;
-    private readonly TextBox _searchBox;
-    private readonly ComboBox _categoryBox;
-    private readonly Label _selectionLabel;
+    private readonly GlassTextBox _searchBox;
+    private readonly GlassSelect _categoryBox;
+    private readonly BufferedLabel _selectionLabel;
     private readonly ActionButton _applyButton;
 
     public OptimizePage(CommandRunner commandRunner, ReceiptStore receiptStore)
@@ -63,42 +63,34 @@ public sealed class OptimizePage : AppPage
             Radius = Theme.RadiusLg,
             SurfaceStyle = SurfaceStyle.Raised
         };
-        _searchBox = new TextBox
+        _searchBox = new GlassTextBox
         {
-            PlaceholderText = "\u641c\u7d22\u540d\u79f0\u6216\u8bf4\u660e",
-            AccessibleName = "\u641c\u7d22\u4f18\u5316\u9879",
-            AccessibleDescription = "\u6309\u540d\u79f0\u6216\u8bf4\u660e\u7b5b\u9009\u4f18\u5316\u9879\u76ee",
-            Font = Theme.Font(10),
-            ForeColor = Theme.TextPrimary,
-            BackColor = Theme.Surface,
-            BorderStyle = BorderStyle.FixedSingle,
-            Location = new Point(28, 32),
-            Size = new Size(350, 38)
+            PlaceholderText = "搜索名称或说明",
+            AccessibleName = "搜索优化项",
+            AccessibleDescription = "按名称或说明筛选优化项目",
+            Location = new Point(28, 31),
+            Size = new Size(350, 42)
         };
-        Theme.StyleTextInput(_searchBox);
         _searchBox.TextChanged += (_, _) => RenderTasks();
-        _categoryBox = new ComboBox
+        _categoryBox = new GlassSelect
         {
-            AccessibleName = "\u4f18\u5316\u5206\u7c7b",
-            AccessibleDescription = "\u6309\u5206\u7c7b\u7b5b\u9009\u4f18\u5316\u9879\u76ee",
-            DropDownStyle = ComboBoxStyle.DropDownList,
-            Font = Theme.Font(9.5f),
-            ForeColor = Theme.TextPrimary,
-            BackColor = Theme.Surface,
-            FlatStyle = FlatStyle.Flat,
+            AccessibleName = "优化分类",
+            AccessibleDescription = "按分类筛选优化项目",
             Location = new Point(394, 31),
-            Size = new Size(180, 40)
+            Size = new Size(180, 42)
         };
-        Theme.StyleDropDown(_categoryBox);
-        _categoryBox.Items.Add("\u5168\u90e8\u5206\u7c7b");
-        _categoryBox.Items.AddRange(OptimizationCatalog.All.Select(action => action.Category).Distinct().Cast<object>().ToArray());
+        _categoryBox.AddItem("全部分类");
+        _categoryBox.AddItems(OptimizationCatalog.All.Select(action => action.Category).Distinct());
         _categoryBox.SelectedIndex = 0;
         _categoryBox.SelectedIndexChanged += (_, _) => RenderTasks();
-        _selectionLabel = new Label
+        _selectionLabel = new BufferedLabel
         {
             Font = Theme.Font(9.5f, FontStyle.Bold),
             ForeColor = Theme.TextSecondary,
+            AutoSize = false,
+            AutoEllipsis = true,
             TextAlign = ContentAlignment.MiddleRight,
+            Padding = new Padding(0, 0, 10, 0),
             Size = new Size(196, 36),
             BackColor = Color.Transparent
         };
@@ -131,24 +123,48 @@ public sealed class OptimizePage : AppPage
 
     private void LayoutCommandDeck(Control commandDeck)
     {
-        var compact = commandDeck.ClientSize.Width < 900;
+        // The command deck is measured in device pixels after DPI scaling. A
+        // one-row layout that fits at 100% can become too narrow at 125/150%,
+        // so switch to the two-row macOS-style toolbar before the label loses
+        // its readable status space.
+        var compact = commandDeck.ClientSize.Width < 1180;
+        var left = 28;
+        var right = 28;
+        var gap = 16;
+        var buttonWidth = Math.Max(140, _applyButton.Width);
+        var contentWidth = Math.Max(1, commandDeck.ClientSize.Width - left - right);
+        var buttonLeft = Math.Max(left, commandDeck.ClientSize.Width - right - buttonWidth);
+
         commandDeck.Height = compact ? 152 : 104;
         if (compact)
         {
-            _searchBox.Width = Math.Max(280, commandDeck.ClientSize.Width - 260);
-            _categoryBox.Location = new Point(_searchBox.Right + 16, 31);
-            _categoryBox.Width = Math.Max(140, commandDeck.ClientSize.Width - _categoryBox.Left - 24);
-            _selectionLabel.Location = new Point(28, 96);
+            // The page can receive a transient 1-2px client width while its
+            // docked parent is being attached. Keep the lower bound valid even
+            // during that first layout pass.
+            var categoryWidth = Math.Min(240, Math.Max(150, contentWidth / 3));
+            _searchBox.Location = new Point(left, 24);
+            _searchBox.Width = Math.Max(180, contentWidth - categoryWidth - gap);
+            _categoryBox.Location = new Point(_searchBox.Right + gap, 24);
+            _categoryBox.Width = Math.Max(150, categoryWidth);
+
+            _selectionLabel.Location = new Point(left, 96);
             _selectionLabel.TextAlign = ContentAlignment.MiddleLeft;
-            _selectionLabel.Width = Math.Max(200, commandDeck.ClientSize.Width - 230);
-            _applyButton.Location = new Point(commandDeck.ClientSize.Width - 194, 86);
+            _selectionLabel.Padding = new Padding(0, 0, 0, 0);
+            _selectionLabel.Width = Math.Max(160, buttonLeft - left - gap);
+            _applyButton.Location = new Point(buttonLeft, 86);
         }
         else
         {
-            _applyButton.Location = new Point(commandDeck.ClientSize.Width - 194, 27);
-            _selectionLabel.Location = new Point(_applyButton.Left - 210, 34);
+            _searchBox.Location = new Point(left, 27);
+            _categoryBox.Location = new Point(_searchBox.Right + gap, 27);
+            _applyButton.Location = new Point(buttonLeft, 27);
+
+            var statusLeft = _categoryBox.Right + gap;
+            var statusWidth = Math.Max(150, _applyButton.Left - gap - statusLeft);
+            _selectionLabel.Location = new Point(statusLeft, 31);
             _selectionLabel.TextAlign = ContentAlignment.MiddleRight;
-            _selectionLabel.Width = 196;
+            _selectionLabel.Padding = new Padding(0, 0, 10, 0);
+            _selectionLabel.Width = statusWidth;
         }
     }
 
