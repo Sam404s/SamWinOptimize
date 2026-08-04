@@ -32,6 +32,9 @@ public sealed class ActionButton : Button
         UseMnemonic = true;
         SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint |
                  ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
+        DoubleBuffered = true;
+        UpdateStyles();
+        Text = string.Empty;
 
         _transitionTimer = new System.Windows.Forms.Timer { Interval = 16 };
         _transitionTimer.Tick += (_, _) => AdvanceTransition();
@@ -106,8 +109,14 @@ public sealed class ActionButton : Button
     protected override void OnPaint(PaintEventArgs eventArgs)
     {
         var graphics = eventArgs.Graphics;
-        graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        // Always reset the complete backing surface before drawing the current
+        // visual state. Button invalidation does not consistently raise a
+        // separate erase pass after state changes, which otherwise leaves the
+        // previous text/glow frame behind the new one.
+        graphics.CompositingMode = CompositingMode.SourceCopy;
+        graphics.Clear(BackColor);
         graphics.CompositingMode = CompositingMode.SourceOver;
+        graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
         var pressedInset = _pressed ? 2 : 0;
         var bounds = new Rectangle(
@@ -257,6 +266,12 @@ public sealed class NavButton : Button
         Margin = new Padding(0, 0, 0, 14);
         SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint |
                  ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
+        DoubleBuffered = true;
+        UpdateStyles();
+        // NavButton paints its own label through TextRenderer. Keeping Button.Text
+        // empty prevents the native Button paint path from contributing a second
+        // glyph layer during focus, resize, or selection transitions.
+        Text = string.Empty;
     }
 
     public string Glyph { get; }
@@ -268,8 +283,14 @@ public sealed class NavButton : Button
         get => _selected;
         set
         {
+            if (_selected == value)
+            {
+                return;
+            }
+
             _selected = value;
             Invalidate();
+            Update();
         }
     }
 
@@ -325,8 +346,13 @@ public sealed class NavButton : Button
     protected override void OnPaint(PaintEventArgs eventArgs)
     {
         var graphics = eventArgs.Graphics;
-        graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        // Clear inside the paint pass as well as OnPaintBackground. This makes
+        // selection changes deterministic even when Windows coalesces the erase
+        // message for a custom-painted Button.
+        graphics.CompositingMode = CompositingMode.SourceCopy;
+        graphics.Clear(BackColor);
         graphics.CompositingMode = CompositingMode.SourceOver;
+        graphics.SmoothingMode = SmoothingMode.AntiAlias;
         var inset = _pressed ? 2 : 0;
         var bounds = new Rectangle(4 + inset, inset,
             Math.Max(1, Width - 8 - (inset * 2)), Math.Max(1, Height - 1 - (inset * 2)));
