@@ -1,0 +1,20 @@
+# Build output
+bin/
+obj/
+publish/
+dist/
+
+# Local/generated tooling
+.tmp/
+.codegraph/
+
+# IDE and OS files
+.vs/
+.idea/
+*.user
+*.suo
+.DS_Store
+Thumbs.db
+
+# Local screenshots and scratch files
+screenshot_*.png

@@ -1,0 +1,112 @@
+using SamWinOptimize.Models;
+
+namespace SamWinOptimize.Services;
+
+public static class OptimizationCatalog
+{
+    public static IReadOnlyList<SystemAction> All { get; } =
+    [
+        new("show-file-extensions", "资源管理器", "显示文件扩展名", "让可执行文件、脚本和文档类型更容易辨认。",
+            "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\" /v HideFileExt /t REG_DWORD /d 0 /f",
+            "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\" /v HideFileExt /t REG_DWORD /d 1 /f",
+            CommandShell.CommandPrompt, RiskLevel.Low, false, false, true),
+        new("open-this-pc", "资源管理器", "资源管理器默认打开此电脑", "跳过快速访问，直接进入驱动器和设备视图。",
+            "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\" /v LaunchTo /t REG_DWORD /d 1 /f",
+            "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\" /v LaunchTo /t REG_DWORD /d 2 /f",
+            CommandShell.CommandPrompt, RiskLevel.Low, false, false, true),
+        new("separate-folder-process", "资源管理器", "文件夹窗口使用独立进程", "资源管理器窗口异常时减少对桌面外壳的连带影响。",
+            "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\" /v SeparateProcess /t REG_DWORD /d 1 /f",
+            "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\" /v SeparateProcess /t REG_DWORD /d 0 /f",
+            CommandShell.CommandPrompt, RiskLevel.Low, false, true, false),
+        new("disable-recent-files", "资源管理器", "减少最近使用记录", "不在快速访问中展示最近使用的文件，适合共享设备。",
+            "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\" /v ShowRecent /t REG_DWORD /d 0 /f",
+            "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\" /v ShowRecent /t REG_DWORD /d 1 /f",
+            CommandShell.CommandPrompt, RiskLevel.Low, false, false, false),
+        new("menu-delay", "响应速度", "缩短菜单响应延迟", "将菜单展开等待时间调整为 120 毫秒。",
+            "reg add \"HKCU\\Control Panel\\Desktop\" /v MenuShowDelay /t REG_SZ /d 120 /f",
+            "reg add \"HKCU\\Control Panel\\Desktop\" /v MenuShowDelay /t REG_SZ /d 400 /f",
+            CommandShell.CommandPrompt, RiskLevel.Low, false, true, true),
+        new("disable-game-dvr", "响应速度", "关闭后台游戏录制", "关闭 Game DVR 捕获，减少不使用录制功能时的后台开销。",
+            "reg add \"HKCU\\System\\GameConfigStore\" /v GameDVR_Enabled /t REG_DWORD /d 0 /f & reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR\" /v AppCaptureEnabled /t REG_DWORD /d 0 /f",
+            "reg add \"HKCU\\System\\GameConfigStore\" /v GameDVR_Enabled /t REG_DWORD /d 1 /f & reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR\" /v AppCaptureEnabled /t REG_DWORD /d 1 /f",
+            CommandShell.CommandPrompt, RiskLevel.Low, false, true, true),
+        new("enable-clipboard-history", "效率", "启用剪贴板历史", "使用 Win+V 调取最近复制的内容。",
+            "reg add \"HKCU\\Software\\Microsoft\\Clipboard\" /v EnableClipboardHistory /t REG_DWORD /d 1 /f",
+            "reg add \"HKCU\\Software\\Microsoft\\Clipboard\" /v EnableClipboardHistory /t REG_DWORD /d 0 /f",
+            CommandShell.CommandPrompt, RiskLevel.Low, false, false, true),
+        new("disable-consumer-content", "隐私", "关闭消费级推荐内容", "减少开始菜单、设置和系统体验中的推荐应用。",
+            "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager\" /v SilentInstalledAppsEnabled /t REG_DWORD /d 0 /f & reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager\" /v SystemPaneSuggestionsEnabled /t REG_DWORD /d 0 /f",
+            "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager\" /v SilentInstalledAppsEnabled /t REG_DWORD /d 1 /f & reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager\" /v SystemPaneSuggestionsEnabled /t REG_DWORD /d 1 /f",
+            CommandShell.CommandPrompt, RiskLevel.Low, false, false, true),
+        new("disable-ad-id", "隐私", "关闭个性化广告标识符", "限制应用使用广告 ID 进行跨应用个性化。",
+            "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo\" /v Enabled /t REG_DWORD /d 0 /f",
+            "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo\" /v Enabled /t REG_DWORD /d 1 /f",
+            CommandShell.CommandPrompt, RiskLevel.Low, false, false, true),
+        new("disable-activity-history", "隐私", "关闭活动历史记录", "停止在本机存储跨设备活动时间线数据。",
+            "reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\System\" /v EnableActivityFeed /t REG_DWORD /d 0 /f & reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\System\" /v PublishUserActivities /t REG_DWORD /d 0 /f",
+            "reg delete \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\System\" /v EnableActivityFeed /f & reg delete \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\System\" /v PublishUserActivities /f",
+            CommandShell.CommandPrompt, RiskLevel.Medium, true, false, false),
+        new("disable-tailored-experiences", "隐私", "关闭诊断数据定制体验", "阻止 Windows 使用诊断数据提供个性化建议。",
+            "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Privacy\" /v TailoredExperiencesWithDiagnosticDataEnabled /t REG_DWORD /d 0 /f",
+            "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Privacy\" /v TailoredExperiencesWithDiagnosticDataEnabled /t REG_DWORD /d 1 /f",
+            CommandShell.CommandPrompt, RiskLevel.Low, false, false, true),
+        new("enable-long-paths", "系统", "启用长路径支持", "允许支持该能力的应用处理超过传统 MAX_PATH 限制的路径。",
+            "reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\FileSystem\" /v LongPathsEnabled /t REG_DWORD /d 1 /f",
+            "reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\FileSystem\" /v LongPathsEnabled /t REG_DWORD /d 0 /f",
+            CommandShell.CommandPrompt, RiskLevel.Low, true, true, true),
+        new("disable-hibernation", "磁盘空间", "关闭休眠并释放 hiberfil.sys", "适合不使用休眠的台式机；快速启动也可能受影响。",
+            "powercfg /hibernate off", "powercfg /hibernate on",
+            CommandShell.CommandPrompt, RiskLevel.Medium, true, false, false),
+        new("high-performance-plan", "电源", "切换高性能电源计划", "优先响应速度和持续性能，可能增加耗电与发热。",
+            "powercfg /setactive SCHEME_MIN", "powercfg /setactive SCHEME_BALANCED",
+            CommandShell.CommandPrompt, RiskLevel.Medium, true, false, false),
+        new("disable-reserved-storage", "磁盘空间", "关闭系统保留存储", "释放部分系统盘空间，但大型更新的可用空间保障会降低。",
+            "DISM /Online /Set-ReservedStorageState /State:Disabled", "DISM /Online /Set-ReservedStorageState /State:Enabled",
+            CommandShell.CommandPrompt, RiskLevel.High, true, true, false),
+        new("exclude-driver-updates", "更新", "质量更新不自动包含驱动", "将硬件驱动更新交由设备管理器或厂商工具维护。",
+            "reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\" /v ExcludeWUDriversInQualityUpdate /t REG_DWORD /d 1 /f",
+            "reg delete \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\" /v ExcludeWUDriversInQualityUpdate /f",
+            CommandShell.CommandPrompt, RiskLevel.Medium, true, false, false),
+        new("edge-background", "Edge", "关闭 Edge 后台运行", "浏览器关闭后不继续保留后台扩展和应用。",
+            "reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Edge\" /v BackgroundModeEnabled /t REG_DWORD /d 0 /f",
+            "reg delete \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Edge\" /v BackgroundModeEnabled /f",
+            CommandShell.CommandPrompt, RiskLevel.Low, true, true, true),
+        new("edge-startup-boost", "Edge", "关闭 Edge 启动增强", "减少登录后的 Edge 预加载，首次启动可能稍慢。",
+            "reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Edge\" /v StartupBoostEnabled /t REG_DWORD /d 0 /f",
+            "reg delete \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Edge\" /v StartupBoostEnabled /f",
+            CommandShell.CommandPrompt, RiskLevel.Low, true, true, false)
+    ];
+
+    public static SystemAction? Find(string id) => All.FirstOrDefault(action => action.Id == id);
+}
+
+public static class CleanupCatalog
+{
+    public static IReadOnlyList<CleanupTask> All { get; } =
+    [
+        new("user-temp", "临时文件", "用户临时目录", "清理当前账户 TEMP 中可删除的文件。",
+            "$p=[IO.Path]::GetTempPath(); Get-ChildItem -LiteralPath $p -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue",
+            CommandShell.PowerShell, RiskLevel.Low, false, true),
+        new("recycle-bin", "临时文件", "回收站", "清空所有驱动器中当前用户的回收站内容。",
+            "Clear-RecycleBin -Force -ErrorAction SilentlyContinue",
+            CommandShell.PowerShell, RiskLevel.Medium, false, false),
+        new("thumbnail-cache", "缓存", "缩略图缓存", "删除资源管理器缩略图数据库，系统会按需重新生成。",
+            "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue; Remove-Item \"$env:LOCALAPPDATA\\Microsoft\\Windows\\Explorer\\thumbcache_*.db\" -Force -ErrorAction SilentlyContinue; Start-Process explorer.exe",
+            CommandShell.PowerShell, RiskLevel.Low, false, false),
+        new("error-reports", "诊断文件", "Windows 错误报告", "删除已归档和排队的本地错误报告。",
+            "Remove-Item \"$env:ProgramData\\Microsoft\\Windows\\WER\\ReportArchive\\*\",\"$env:ProgramData\\Microsoft\\Windows\\WER\\ReportQueue\\*\" -Recurse -Force -ErrorAction SilentlyContinue",
+            CommandShell.PowerShell, RiskLevel.Low, true, true),
+        new("memory-dumps", "诊断文件", "崩溃转储文件", "删除系统根目录和 Minidump 中的崩溃转储；排障前请保留。",
+            "Remove-Item \"$env:SystemRoot\\MEMORY.DMP\",\"$env:SystemRoot\\Minidump\\*\" -Force -ErrorAction SilentlyContinue",
+            CommandShell.PowerShell, RiskLevel.Medium, true, false),
+        new("delivery-cache", "更新缓存", "传递优化缓存", "清理 Windows 更新的传递优化下载缓存。",
+            "Delete-DeliveryOptimizationCache -Force -ErrorAction SilentlyContinue",
+            CommandShell.PowerShell, RiskLevel.Low, true, true),
+        new("windows-temp", "临时文件", "Windows 临时目录", "清理系统 TEMP 中未被占用的文件。",
+            "Remove-Item \"$env:SystemRoot\\Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue",
+            CommandShell.PowerShell, RiskLevel.Low, true, true),
+        new("component-cleanup", "系统组件", "组件存储清理", "让 DISM 清理已被替代的系统组件；执行时间较长。",
+            "DISM /Online /Cleanup-Image /StartComponentCleanup",
+            CommandShell.CommandPrompt, RiskLevel.Medium, true, false)
+    ];
+}
