@@ -34,7 +34,7 @@ public sealed class PageHeader : Panel
 
     public PageHeader(string glyph, string title, string description)
     {
-        Height = 150;
+        Height = 132;
         Dock = DockStyle.Top;
         BackColor = Color.Transparent;
         Padding = new Padding(0, 0, 0, 30);
@@ -46,7 +46,7 @@ public sealed class PageHeader : Panel
             SurfaceStyle = SurfaceStyle.Accent,
             Radius = Theme.RadiusXl,
             Size = new Size(64, 64),
-            Location = new Point(0, 8),
+            Location = new Point(0, 2),
             Padding = new Padding(1)
         };
         iconTile.Controls.Add(new BufferedLabel
@@ -65,7 +65,7 @@ public sealed class PageHeader : Panel
             Font = Theme.MonoFont(8, FontStyle.Bold),
             ForeColor = Theme.Accent,
             AutoSize = true,
-            Location = new Point(96, 2),
+            Location = new Point(96, 0),
             BackColor = Color.Transparent
         };
 
@@ -77,8 +77,8 @@ public sealed class PageHeader : Panel
             AutoSize = false,
             AutoEllipsis = true,
             TextAlign = ContentAlignment.MiddleLeft,
-            Location = new Point(94, 16),
-            Size = new Size(360, 42),
+            Location = new Point(94, 20),
+            Size = new Size(360, 40),
             BackColor = Color.Transparent
         };
 
@@ -91,8 +91,8 @@ public sealed class PageHeader : Panel
             AutoSize = false,
             WordWrap = true,
             TextAlign = ContentAlignment.TopLeft,
-            Location = new Point(96, 61),
-            Size = new Size(700, 48),
+            Location = new Point(96, 62),
+            Size = new Size(700, 30),
             BackColor = Color.Transparent
         };
 
@@ -104,7 +104,7 @@ public sealed class PageHeader : Panel
             Width = 0,
             FlowDirection = FlowDirection.RightToLeft,
             WrapContents = false,
-            Padding = new Padding(0, 20, 0, 0),
+            Padding = new Padding(0, 10, 0, 0),
             BackColor = Color.Transparent
         };
 
@@ -118,6 +118,16 @@ public sealed class PageHeader : Panel
             var rightLimit = Math.Max(220, Width - ActionHost.Width - 118);
             titleLabel.Width = rightLimit;
             _descriptionLabel.Width = rightLimit;
+
+            var measuredDescription = TextRenderer.MeasureText(
+                _descriptionLabel.Text,
+                _descriptionLabel.Font,
+                new Size(rightLimit, int.MaxValue),
+                TextFormatFlags.NoPrefix | TextFormatFlags.WordBreak).Height;
+            var descriptionHeight = Math.Clamp(measuredDescription + 4, 26, 72);
+            _descriptionLabel.Height = descriptionHeight;
+            var bottomGap = descriptionHeight > 30 ? 38 : 24;
+            Height = Math.Max(132, _descriptionLabel.Bottom + bottomGap);
         }
 
         Resize += (_, _) => ResizeTextBounds();

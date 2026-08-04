@@ -55,7 +55,7 @@ public sealed class SecurityPage : AppPage
         defenderCard.Controls.Add(defenderActions);
         defenderCard.Resize += (_, _) =>
         {
-            SecurityPageLayout.FitStatus(defenderCard, _defenderStatus, 106, 78);
+            SecurityPageLayout.FitStatus(defenderCard, _defenderStatus, 118, 78);
             defenderActions.Width = Math.Max(420, defenderCard.ClientSize.Width - 136);
             defenderActions.Location = new Point(106, defenderCard.ClientSize.Height - 66);
         };
@@ -64,18 +64,18 @@ public sealed class SecurityPage : AppPage
         var activationCard = SecurityPageLayout.BuildCard(
             "\uE73E", "Windows 许可证",
             "只读显示 Windows 授权状态、渠道和部分产品密钥；疑难解答由系统设置处理。", 222);
-        _licenseStatus = SecurityPageLayout.CreateStatusLabel(new Point(110, 106), new Size(650, 48));
+        _licenseStatus = SecurityPageLayout.CreateStatusLabel(new Point(110, 116), new Size(430, 48));
         activationCard.Controls.Add(_licenseStatus);
-        activationCard.Resize += (_, _) => SecurityPageLayout.FitStatus(activationCard, _licenseStatus, 106, 72);
+        activationCard.Resize += (_, _) => SecurityPageLayout.FitStatus(activationCard, _licenseStatus, 116, 48, 230);
         SecurityPageLayout.AddLauncherButton(activationCard, "打开激活设置", "ms-settings:activation", 124);
         flow.Controls.Add(activationCard);
 
         var officeCard = SecurityPageLayout.BuildCard(
             "\uE8D2", "Office 许可证",
             "读取本机 Software Licensing Service 中可见的 Office 许可证条目，不安装密钥或修改授权。", 218);
-        _officeStatus = SecurityPageLayout.CreateStatusLabel(new Point(110, 106), new Size(760, 48));
+        _officeStatus = SecurityPageLayout.CreateStatusLabel(new Point(110, 116), new Size(760, 48));
         officeCard.Controls.Add(_officeStatus);
-        officeCard.Resize += (_, _) => SecurityPageLayout.FitStatus(officeCard, _officeStatus, 106, 22);
+        officeCard.Resize += (_, _) => SecurityPageLayout.FitStatus(officeCard, _officeStatus, 116, 22);
         flow.Controls.Add(officeCard);
 
         var appControlCard = SecurityPageLayout.BuildCard(
@@ -84,16 +84,16 @@ public sealed class SecurityPage : AppPage
         var appControlStatus = SecurityPageLayout.CreateFixedStatus(
             "建议保持 SmartScreen 和基于声誉的保护开启", Theme.Success);
         appControlCard.Controls.Add(appControlStatus);
-        appControlCard.Resize += (_, _) => SecurityPageLayout.FitStatus(appControlCard, appControlStatus, 108, 70);
+        appControlCard.Resize += (_, _) => SecurityPageLayout.FitStatus(appControlCard, appControlStatus, 114, 56, 230);
         SecurityPageLayout.AddLauncherButton(appControlCard, "打开应用控制", "windowsdefender://appbrowser", 104);
         flow.Controls.Add(appControlCard);
 
         var adminCard = SecurityPageLayout.BuildCard(
             "\uE7EF", "权限与执行透明度",
             "默认使用当前用户权限；受支持的系统操作会单独申请 UAC，并保留退出代码与错误记录。", 202);
-        _adminStatus = SecurityPageLayout.CreateStatusLabel(new Point(110, 112), new Size(620, 34));
+        _adminStatus = SecurityPageLayout.CreateStatusLabel(new Point(110, 114), new Size(430, 38));
         adminCard.Controls.Add(_adminStatus);
-        adminCard.Resize += (_, _) => SecurityPageLayout.FitStatus(adminCard, _adminStatus, 108, 70);
+        adminCard.Resize += (_, _) => SecurityPageLayout.FitStatus(adminCard, _adminStatus, 114, 56, 230);
         SecurityPageLayout.AddLauncherButton(adminCard, "打开账户设置", "ms-settings:yourinfo", 104);
         flow.Controls.Add(adminCard);
 

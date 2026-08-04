@@ -42,11 +42,12 @@ public sealed class MetricCard : SurfacePanel
             Text = "\u8bfb\u53d6\u4e2d\u2026",
             Font = Theme.DisplayFont(15, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
-            AutoEllipsis = true,
+            AutoEllipsis = false,
             AutoSize = false,
+            WordWrap = true,
             TextAlign = ContentAlignment.MiddleLeft,
             Location = new Point(24, 58),
-            Size = new Size(200, 38),
+            Size = new Size(200, 48),
             BackColor = Color.Transparent
         };
 
@@ -55,11 +56,11 @@ public sealed class MetricCard : SurfacePanel
             Text = "\u6b63\u5728\u68c0\u6d4b\u8bbe\u5907",
             Font = Theme.Font(9),
             ForeColor = Theme.TextSecondary,
-            AutoEllipsis = true,
+            AutoEllipsis = false,
             AutoSize = false,
             TextAlign = ContentAlignment.MiddleLeft,
             Location = new Point(25, 108),
-            Size = new Size(200, 30),
+            Size = new Size(200, 28),
             BackColor = Color.Transparent
         };
 
@@ -69,10 +70,10 @@ public sealed class MetricCard : SurfacePanel
         Controls.Add(_hintLabel);
         Resize += (_, _) =>
         {
-            var textWidth = Math.Max(80, ClientSize.Width - 50);
+            var textWidth = AvailableTextWidth;
             _valueLabel.Width = textWidth;
             _hintLabel.Width = textWidth;
-            _valueLabel.Font = Theme.DisplayFont(ClientSize.Width < 190 ? 13.5f : 15.5f, FontStyle.Bold);
+            FitTypography(textWidth);
         };
     }
 
@@ -80,7 +81,60 @@ public sealed class MetricCard : SurfacePanel
     {
         _valueLabel.Text = value;
         _hintLabel.Text = hint;
+        FitTypography(AvailableTextWidth);
         _valueLabel.Invalidate();
         _hintLabel.Invalidate();
+    }
+
+    private int AvailableTextWidth => Math.Max(80, Width - 50);
+
+    private void FitTypography(int textWidth)
+    {
+        _valueLabel.Font = FitFont(
+            _valueLabel.Text,
+            textWidth,
+            15.5f,
+            9.25f,
+            bold: true,
+            display: true);
+        _hintLabel.Font = FitFont(
+            _hintLabel.Text,
+            textWidth,
+            9f,
+            7.8f,
+            bold: false,
+            display: false);
+    }
+
+    private static Font FitFont(
+        string text,
+        int width,
+        float preferredSize,
+        float minimumSize,
+        bool bold,
+        bool display)
+    {
+        var style = bold ? FontStyle.Bold : FontStyle.Regular;
+        for (var size = preferredSize; size >= minimumSize; size -= 0.25f)
+        {
+            var font = display
+                ? Theme.DisplayFont(size, style)
+                : Theme.Font(size, style);
+            var measured = TextRenderer.MeasureText(
+                text,
+                font,
+                new Size(int.MaxValue, int.MaxValue),
+                TextFormatFlags.NoPrefix | TextFormatFlags.SingleLine).Width;
+            if (measured <= width)
+            {
+                return font;
+            }
+
+            font.Dispose();
+        }
+
+        return display
+            ? Theme.DisplayFont(minimumSize, style)
+            : Theme.Font(minimumSize, style);
     }
 }

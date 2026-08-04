@@ -179,9 +179,52 @@ public sealed class HistoryPage : AppPage
         return grid;
     }
 
-    private static void UpdateSplitLayout(SplitContainer split)
+    private void UpdateSplitLayout(SplitContainer split)
     {
-        split.SplitterDistance = Math.Max(380, (int)(split.ClientSize.Width * 0.52));
+        if (split.ClientSize.Width <= 0 || split.ClientSize.Height <= 0)
+        {
+            return;
+        }
+
+        var stacked = split.ClientSize.Width < 900;
+        var desiredOrientation = stacked ? Orientation.Horizontal : Orientation.Vertical;
+        var currentAxis = (split.Orientation == Orientation.Horizontal
+            ? split.ClientSize.Height
+            : split.ClientSize.Width) - split.SplitterWidth;
+        var targetAxis = (desiredOrientation == Orientation.Horizontal
+            ? split.ClientSize.Height
+            : split.ClientSize.Width) - split.SplitterWidth;
+        var minimumAxis = split.Panel1MinSize + split.Panel2MinSize;
+        if (currentAxis < minimumAxis || targetAxis < minimumAxis)
+        {
+            return;
+        }
+
+        if (split.Orientation != desiredOrientation)
+        {
+            // Orientation validates the existing distance against the new
+            // axis immediately. Reset the current axis first, then size the
+            // new axis below.
+            split.SplitterDistance = split.Panel1MinSize;
+            split.Orientation = desiredOrientation;
+        }
+
+        var available = (stacked ? split.ClientSize.Height : split.ClientSize.Width) - split.SplitterWidth;
+        var maximum = Math.Max(split.Panel1MinSize, available - split.Panel2MinSize);
+        if (stacked)
+        {
+            split.SplitterDistance = Math.Clamp(
+                (int)(split.ClientSize.Height * 0.56),
+                split.Panel1MinSize,
+                maximum);
+        }
+        else
+        {
+            split.SplitterDistance = Math.Clamp(
+                (int)(split.ClientSize.Width * 0.52),
+                Math.Min(380, maximum),
+                maximum);
+        }
     }
 
     private async Task LoadHistoryAsync()

@@ -86,15 +86,20 @@ internal static class SecurityPageLayout
 
     public static BufferedLabel CreateFixedStatus(string text, Color color)
     {
-        var label = CreateStatusLabel(new Point(110, 114), new Size(620, 38));
+        var label = CreateStatusLabel(new Point(110, 114), new Size(430, 38));
         label.Text = text;
         label.ForeColor = color;
         return label;
     }
 
-    public static void FitStatus(Control card, BufferedLabel status, int top, int reservedBottom = 22)
+    public static void FitStatus(
+        Control card,
+        BufferedLabel status,
+        int top,
+        int reservedBottom = 22,
+        int reservedRight = 0)
     {
-        var width = Math.Max(300, card.ClientSize.Width - 142);
+        var width = Math.Max(300, card.ClientSize.Width - 142 - reservedRight);
         status.Location = new Point(110, top);
         status.Size = new Size(width, Math.Max(28, card.ClientSize.Height - top - reservedBottom));
     }

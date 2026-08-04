@@ -19,7 +19,7 @@ public sealed class ToolboxPage : AppPage
         {
             Dock = DockStyle.Top,
             AutoSize = true,
-            AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            AutoSizeMode = AutoSizeMode.GrowOnly,
             FlowDirection = FlowDirection.TopDown,
             WrapContents = false,
             BackColor = Theme.Canvas,
@@ -93,8 +93,9 @@ public sealed class ToolboxPage : AppPage
     private static FlowLayoutPanel CreateGrid() => new()
     {
         Width = 980,
-        AutoSize = true,
-        AutoSizeMode = AutoSizeMode.GrowAndShrink,
+        AutoSize = false,
+        AutoSizeMode = AutoSizeMode.GrowOnly,
+        FlowDirection = FlowDirection.LeftToRight,
         WrapContents = true,
         BackColor = Theme.Canvas,
         Padding = new Padding(0),
@@ -202,10 +203,16 @@ public sealed class ToolboxPage : AppPage
     private static void ResizeCards(FlowLayoutPanel flow, int available)
     {
         flow.Width = available;
-        var cardWidth = available >= 840 ? (available - 18) / 2 : available;
+        var columns = available >= 840 ? 2 : 1;
+        var cardWidth = columns == 2
+            ? (available - (columns * 18)) / columns
+            : available;
         foreach (Control card in flow.Controls)
         {
             card.Width = cardWidth;
         }
+
+        var rows = (int)Math.Ceiling(flow.Controls.Count / (double)columns);
+        flow.Height = Math.Max(1, rows * 218);
     }
 }
