@@ -3,8 +3,8 @@
 ## 0. Design Decision Log
 
 - Product surface: native .NET WinForms desktop utility for Windows 10/11.
-- Redesign intent: modern, calm, spacious, friendly, and operationally trustworthy. Information density is reduced without hiding execution scope, risk, or rollback information.
-- Current visual direction: fresh, low-saturation Windows productivity system with generous breathing room.
+- Redesign intent: modern, spacious, operationally trustworthy, and visually confident. Information density is reduced without hiding execution scope, risk, or rollback information.
+- Current visual direction: atmospheric dark glass system with deep navy depth, electric cyan signal color, floating surfaces, and generous breathing room.
   - Hero architecture: Editorial Split.
   - Typography direction: Outfit, adapted to installed Windows fonts as `Segoe UI Variable Display` and `Segoe UI Variable Text`.
   - Component architectures: Ambient Status Canvas, Command Deck, Editorial Metric Rail.
@@ -13,7 +13,7 @@
 
 ## 1. Atmosphere and Identity
 
-SamWinOptimize is a quiet Windows care workspace, not a dense administrator console. The shell uses a warm off-white canvas, a pale mint navigation rail, and airy editorial spacing. White surfaces feel grouped rather than boxed-in. Deep teal identifies the primary path; calm green, amber, and muted red communicate health, attention, and destructive impact. Copy is direct and reassuring, with enough whitespace to scan before acting.
+SamWinOptimize is an atmospheric Windows care workspace, not a dense administrator console. The shell uses a deep navy canvas, a layered sidebar, and floating glass surfaces with cyan hairlines and soft ambient glow. Cards feel like transparent panels suspended above the workspace instead of flat white boxes. Electric cyan identifies the primary path; mint, amber, rose, and violet communicate health, attention, destructive impact, and neutral system state. Copy is direct and reassuring, with enough whitespace to scan before acting.
 
 The visual hierarchy follows four chapters:
 
@@ -26,34 +26,39 @@ The visual hierarchy follows four chapters:
 
 | Role | Token | Value | Usage |
 |---|---|---:|---|
-| Canvas | `Canvas` | `#F7FAFB` | Warm, quiet application background |
-| Canvas soft | `CanvasSoft` | `#EEF6F7` | Workspace and status transitions |
-| Sidebar | `Sidebar` | `#F2F8F8` | Airy navigation rail |
-| Sidebar raised | `SidebarRaised` | `#E7F2F2` | Brand and permission surfaces |
-| Surface | `Surface` | `#FFFFFF` | Primary cards and grouped content |
-| Surface raised | `SurfaceRaised` | `#FCFEFE` | Inputs, selected rows, secondary actions |
-| Surface hover | `SurfaceHover` | `#E2F1F0` | Hover state |
-| Surface strong | `SurfaceStrong` | `#EDF7F7` | Pressed state and emphasized blocks |
-| Text primary | `TextPrimary` | `#19333B` | Titles and important values |
-| Text secondary | `TextSecondary` | `#4E696F` | Body copy |
-| Text muted | `TextMuted` | `#748B8F` | Metadata and disabled states |
-| Border | `Border` | `#D3E3E2` | Neutral surface outline |
-| Border strong | `BorderStrong` | `#ACCDCA` | Focus-neutral elevated outline |
-| Accent | `Accent` | `#178F89` | Primary action and active navigation |
-| Accent strong | `AccentStrong` | `#0D746F` | Pressed primary action |
-| Accent wash | `AccentWash` | `#DCF3F0` | Selected background |
-| Accent soft | `AccentSoft` | `#A8DAD4` | Focus and progress track |
-| Success | `Success` | `#2F8D5F` | Healthy and completed |
-| Warning | `Warning` | `#B47D2D` | Confirmation and restart |
-| Danger | `Danger` | `#C14E54` | Destructive and failed |
-| Danger surface | `DangerSurface` | `#FCECED` | Destructive context |
-| Info | `Info` | `#3E77B1` | Neutral system state |
+| Canvas | `Canvas` | `#08111F` | Deep navy application background |
+| Canvas soft | `CanvasSoft` | `#0D1B2B` | Workspace and status transitions |
+| Sidebar | `Sidebar` | `#0A1727` | Layered navigation rail |
+| Sidebar raised | `SidebarRaised` | `#10243A` | Brand, navigation, and permission surfaces |
+| Surface | `Surface` | `#102236` | Primary glass cards and grouped content |
+| Surface raised | `SurfaceRaised` | `#152C43` | Inputs, selected rows, and secondary actions |
+| Surface hover | `SurfaceHover` | `#1A3851` | Hover state and tonal lift |
+| Surface strong | `SurfaceStrong` | `#1E405A` | Pressed state and emphasized blocks |
+| Glass top | `GlassTop` | `#2B5B78` | Transparent top highlight and depth cue |
+| Glass bottom | `GlassBottom` | `#0A1728` | Lower glass gradient anchor |
+| Text primary | `TextPrimary` | `#E9F6FF` | Titles and important values |
+| Text secondary | `TextSecondary` | `#AFC6D7` | Body copy |
+| Text muted | `TextMuted` | `#6F8DA3` | Metadata and disabled states |
+| Border | `Border` | `#26455D` | Neutral surface outline |
+| Border strong | `BorderStrong` | `#3A6682` | Focus-neutral elevated outline |
+| Glass highlight | `GlassHighlight` | `#8EDCFF` | Hairline highlights and edge glints |
+| Accent | `Accent` | `#25D4FF` | Primary action and active navigation |
+| Accent strong | `AccentStrong` | `#0AB1DD` | Pressed primary action |
+| Accent wash | `AccentWash` | `#123E52` | Selected background and cyan wash |
+| Accent soft | `AccentSoft` | `#8EEFFF` | Focus and progress track |
+| Accent deep | `AccentDeep` | `#084B75` | Deep gradient anchor for primary surfaces |
+| Success | `Success` | `#57E2B2` | Healthy and completed |
+| Warning | `Warning` | `#FFCC66` | Confirmation and restart |
+| Danger | `Danger` | `#FF7095` | Destructive and failed |
+| Danger surface | `DangerSurface` | `#442338` | Destructive context |
+| Info | `Info` | `#A18FFF` | Neutral system state |
 
 Rules:
 
 - Accent is used for one primary path per surface, selection, focus, and verified active state.
 - Danger never competes with the primary action unless the page is explicitly destructive.
-- Depth comes from pale tonal surfaces, concise rounded outlines, and restrained borders. No generic shadow stack.
+- Depth comes from layered translucent gradients, soft cyan glow, hairline highlights, and restrained shadows; surfaces should feel like glass, not opaque rectangles.
+- Use glow as an edge cue, never as a substitute for hierarchy or contrast.
 - Status is always text plus color, never color alone.
 ## 3. Typography
 
@@ -88,16 +93,16 @@ Rules:
 
 - Base unit: 4 px.
 - Spacing scale: `4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 56, 64`.
-- Default window: 1420×900.
-- Minimum window: 1180×760.
-- Sidebar: 286 px, fixed for this release.
-- Status bar: 44 px.
+- Default window: 1520×960.
+- Minimum window: 1240×800.
+- Sidebar: 344 px, fixed for this release.
+- Status bar: 56 px.
 - Page padding: 40 px horizontal, 32 px top, 36 px bottom.
-- Page header: 112 px including its bottom breathing room.
+- Page header: 146 px including its bottom breathing room.
 - Section gap: 20–28 px.
 - Primary surface padding: 28–32 px.
 - Card padding: 22–28 px.
-- Navigation item: 54 px high with 8 px inter-item rhythm.
+- Navigation item: 64 px high with 14 px inter-item rhythm; compact mode reduces to 56 px with 6 px rhythm.
 - Action button: 46 px default height, 40 px compact minimum.
 - Task card: 116 px minimum height.
 - Table header: 48–52 px; row: 54–58 px.
@@ -105,7 +110,7 @@ Rules:
 
 Responsive rules:
 
-- At 1180 px window width, content remains readable without horizontal scrolling.
+- At the 1240 px minimum window width, content remains readable without horizontal scrolling.
 - Editorial two-column groups collapse to one column before body copy becomes narrow.
 - Tool and metric grids use two columns only when each item receives at least 360 px.
 - Header actions remain on one line; less important actions may move into the page command deck at narrow widths.
@@ -122,7 +127,7 @@ Responsive rules:
 
 ### Page header
 
-- 64 px icon tile, 22 pt title, and one-line supportive description.
+- 70 px glass icon tile, 26 pt title, technical eyebrow, and one-line supportive description.
 - Icon tile is visually secondary to the title, not a decorative badge.
 - Actions align right and use 46 px controls.
 - Header remains visually open; no pills or metrics are placed inside it.
@@ -174,9 +179,9 @@ All variants define rounded geometry, border color, fill color, focus-neutral to
 
 ### Buttons
 
-- Primary: deep teal fill, white text, one per command surface.
-- Secondary: white raised fill, deep teal text, visible border.
-- Danger: coral-tinted fill, light text.
+- Primary: electric cyan-to-deep-blue glass gradient, light text, one per command surface.
+- Secondary: dark raised glass fill, light text, visible hairline border.
+- Danger: rose-tinted glass fill, light text.
 - All variants define default, hover, pressed, focus-visible, disabled, and loading states.
 
 ## 7. Motion and Feedback

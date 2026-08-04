@@ -18,12 +18,11 @@ public sealed class StatusPill : Label
 
     protected override void OnPaintBackground(PaintEventArgs eventArgs)
     {
-        base.OnPaintBackground(eventArgs);
         eventArgs.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
         var bounds = new Rectangle(0, 0, Math.Max(1, Width - 1), Math.Max(1, Height - 1));
         using var path = Theme.RoundedRectangle(bounds, Theme.RadiusSm);
-        using var fill = new SolidBrush(Color.FromArgb(30, ForeColor));
-        using var border = new Pen(Color.FromArgb(80, ForeColor));
+        using var fill = new SolidBrush(Color.FromArgb(34, ForeColor));
+        using var border = new Pen(Color.FromArgb(100, ForeColor));
         eventArgs.Graphics.FillPath(fill, path);
         eventArgs.Graphics.DrawPath(border, path);
     }
@@ -35,47 +34,59 @@ public sealed class PageHeader : Panel
 
     public PageHeader(string glyph, string title, string description)
     {
-        Height = 124;
+        Height = 146;
         Dock = DockStyle.Top;
-        BackColor = Theme.Canvas;
-        Padding = new Padding(0, 0, 0, 28);
+        BackColor = Color.Transparent;
+        Padding = new Padding(0, 0, 0, 30);
+        SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer |
+                 ControlStyles.ResizeRedraw, true);
 
         var iconTile = new SurfacePanel
         {
-            SurfaceStyle = SurfaceStyle.Raised,
-            Radius = Theme.RadiusLg,
-            Size = new Size(62, 62),
-            Location = new Point(0, 4),
+            SurfaceStyle = SurfaceStyle.Accent,
+            Radius = Theme.RadiusXl,
+            Size = new Size(70, 70),
+            Location = new Point(0, 8),
             Padding = new Padding(1)
         };
         iconTile.Controls.Add(new Label
         {
             Text = glyph,
-            Font = Theme.IconFont(20),
-            ForeColor = Theme.Accent,
+            Font = Theme.IconFont(22),
+            ForeColor = Theme.AccentSoft,
             BackColor = Color.Transparent,
             TextAlign = ContentAlignment.MiddleCenter,
             Dock = DockStyle.Fill
         });
 
+        var eyebrow = new Label
+        {
+            Text = "SAM / CONTROL PLANE",
+            Font = Theme.MonoFont(8, FontStyle.Bold),
+            ForeColor = Theme.Accent,
+            AutoSize = true,
+            Location = new Point(96, 2),
+            BackColor = Color.Transparent
+        };
+
         var titleLabel = new Label
         {
             Text = title,
-            Font = Theme.DisplayFont(23, FontStyle.Bold),
+            Font = Theme.DisplayFont(26, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
             AutoSize = true,
-            Location = new Point(84, 2),
+            Location = new Point(94, 20),
             BackColor = Color.Transparent
         };
 
         _descriptionLabel = new Label
         {
             Text = description,
-            Font = Theme.Font(10.2f),
+            Font = Theme.Font(10.5f),
             ForeColor = Theme.TextSecondary,
             AutoEllipsis = true,
-            Location = new Point(86, 46),
-            Size = new Size(700, 32),
+            Location = new Point(96, 66),
+            Size = new Size(700, 34),
             BackColor = Color.Transparent
         };
 
@@ -85,17 +96,18 @@ public sealed class PageHeader : Panel
             Width = 440,
             FlowDirection = FlowDirection.RightToLeft,
             WrapContents = false,
-            Padding = new Padding(0, 12, 0, 0),
-            BackColor = Theme.Canvas
+            Padding = new Padding(0, 20, 0, 0),
+            BackColor = Color.Transparent
         };
 
         Controls.Add(ActionHost);
+        Controls.Add(eyebrow);
         Controls.Add(iconTile);
         Controls.Add(titleLabel);
         Controls.Add(_descriptionLabel);
         Resize += (_, _) =>
         {
-            var rightLimit = Math.Max(260, Width - ActionHost.Width - 108);
+            var rightLimit = Math.Max(260, Width - ActionHost.Width - 118);
             _descriptionLabel.Width = rightLimit;
         };
     }

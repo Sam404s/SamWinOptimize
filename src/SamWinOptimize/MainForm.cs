@@ -21,8 +21,8 @@ public sealed class MainForm : Form
     {
         Text = "SamWinOptimize";
         StartPosition = FormStartPosition.CenterScreen;
-        Size = new Size(1440, 920);
-        MinimumSize = new Size(1180, 760);
+        Size = new Size(1520, 960);
+        MinimumSize = new Size(1240, 800);
         BackColor = Theme.Canvas;
         ForeColor = Theme.TextPrimary;
         Font = Theme.Font(9.5f);
@@ -31,7 +31,7 @@ public sealed class MainForm : Form
         DoubleBuffered = true;
         SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer |
                  ControlStyles.ResizeRedraw, true);
-        HandleCreated += (_, _) => EnableLightTitleBar();
+        HandleCreated += (_, _) => EnableDarkTitleBar();
 
         var shell = new TableLayoutPanel
         {
@@ -42,17 +42,17 @@ public sealed class MainForm : Form
             Padding = new Padding(0),
             BackColor = Theme.Canvas
         };
-        shell.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 320));
+        shell.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 344));
         shell.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
         var sidebar = BuildSidebar();
-        var workspace = new BufferedPanel
+        var workspace = new BackdropPanel
         {
             Dock = DockStyle.Fill,
             BackColor = Theme.Canvas,
             Padding = new Padding(0)
         };
-        _pageHost = new BufferedPanel
+        _pageHost = new BackdropPanel
         {
             Dock = DockStyle.Fill,
             BackColor = Theme.Canvas
@@ -69,11 +69,12 @@ public sealed class MainForm : Form
 
     private Panel BuildSidebar()
     {
-        var sidebar = new BufferedPanel
+        var sidebar = new BackdropPanel
         {
             Dock = DockStyle.Fill,
             BackColor = Theme.Sidebar,
-            Padding = new Padding(24, 0, 24, 28)
+            SidebarMode = true,
+            Padding = new Padding(28, 0, 28, 28)
         };
         var brand = BuildBrand();
         var nav = new BufferedFlowLayoutPanel
@@ -83,7 +84,7 @@ public sealed class MainForm : Form
             AutoSizeMode = AutoSizeMode.GrowAndShrink,
             FlowDirection = FlowDirection.TopDown,
             WrapContents = false,
-            BackColor = Theme.Sidebar,
+            BackColor = Theme.SidebarRaised,
             Padding = new Padding(0),
             Margin = new Padding(0)
         };
@@ -124,11 +125,12 @@ public sealed class MainForm : Form
 
     private static Panel BuildBrand()
     {
-        var brand = new BufferedPanel
+        var brand = new BackdropPanel
         {
             Dock = DockStyle.Top,
             Height = 140,
-            BackColor = Theme.Sidebar
+            BackColor = Theme.Sidebar,
+            SidebarMode = true
         };
         var markTile = new SurfacePanel
         {
@@ -142,27 +144,31 @@ public sealed class MainForm : Form
         {
             Text = "S",
             Font = Theme.DisplayFont(22, FontStyle.Bold),
-            ForeColor = Color.White,
-            BackColor = Theme.Accent,
+            ForeColor = Theme.TextPrimary,
+            BackColor = Color.Transparent,
             TextAlign = ContentAlignment.MiddleCenter,
             Dock = DockStyle.Fill
         });
         var name = new Label
         {
-            Text = "SamWinOptimize",
-            Font = Theme.DisplayFont(15.5f, FontStyle.Bold),
+            Text = "SamWin",
+            Font = Theme.DisplayFont(18, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
-            AutoSize = true,
-            Location = new Point(74, 34),
+            AutoEllipsis = true,
+            TextAlign = ContentAlignment.MiddleLeft,
+            Location = new Point(74, 30),
+            Size = new Size(214, 34),
             BackColor = Color.Transparent
         };
         var tagline = new Label
         {
-            Text = "\u5b89\u5168 \u00b7 \u900f\u660e \u00b7 \u53ef\u8fd8\u539f",
-            Font = Theme.Font(9),
+            Text = "OPTIMIZE  ·  GLASS",
+            Font = Theme.MonoFont(8.2f),
             ForeColor = Theme.TextMuted,
-            AutoSize = true,
+            AutoEllipsis = true,
+            TextAlign = ContentAlignment.MiddleLeft,
             Location = new Point(76, 64),
+            Size = new Size(212, 20),
             BackColor = Color.Transparent
         };
         brand.Controls.Add(markTile);
@@ -177,7 +183,7 @@ public sealed class MainForm : Form
         {
             Dock = DockStyle.Bottom,
             Height = 140,
-            SurfaceStyle = SurfaceStyle.Quiet,
+            SurfaceStyle = SurfaceStyle.Accent,
             Radius = Theme.RadiusLg,
             Padding = new Padding(22, 18, 22, 18)
         };
@@ -217,10 +223,10 @@ public sealed class MainForm : Form
 
     private Panel BuildStatusBar()
     {
-        var statusBar = new Panel
+        var statusBar = new BackdropPanel
         {
             Dock = DockStyle.Bottom,
-            Height = 48,
+            Height = 56,
             BackColor = Theme.CanvasSoft,
             Padding = new Padding(32, 0, 32, 0)
         };
@@ -333,14 +339,14 @@ public sealed class MainForm : Form
         _ => throw new ArgumentOutOfRangeException(nameof(route), route, null)
     };
 
-    private void EnableLightTitleBar()
+    private void EnableDarkTitleBar()
     {
         if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763))
         {
             return;
         }
 
-        var enabled = 0;
+        var enabled = 1;
         var result = DwmSetWindowAttribute(Handle, 20, ref enabled, sizeof(int));
         if (result != 0)
         {
@@ -366,5 +372,3 @@ public sealed class MainForm : Form
         ref int attributeValue,
         int attributeSize);
 }
-
-

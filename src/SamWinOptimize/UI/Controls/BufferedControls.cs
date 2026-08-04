@@ -1,3 +1,5 @@
+using System.ComponentModel;
+using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 
 namespace SamWinOptimize.UI.Controls;
@@ -44,6 +46,50 @@ public class BufferedPanel : Panel
         }
 
         base.WndProc(ref message);
+    }
+}
+
+
+public sealed class BackdropPanel : BufferedPanel
+{
+    [DefaultValue(false)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool SidebarMode { get; set; }
+
+    protected override void OnPaintBackground(PaintEventArgs eventArgs)
+    {
+        var graphics = eventArgs.Graphics;
+        var start = SidebarMode ? Theme.SidebarRaised : Theme.Canvas;
+        var end = SidebarMode ? Theme.Sidebar : Theme.CanvasSoft;
+        graphics.Clear(start);
+        graphics.SmoothingMode = SmoothingMode.AntiAlias;
+
+        using (var gradient = new LinearGradientBrush(ClientRectangle, start, end, 105f))
+        {
+            graphics.FillRectangle(gradient, ClientRectangle);
+        }
+
+        var glowBounds = SidebarMode
+            ? new Rectangle(-110, -80, 300, 260)
+            : new Rectangle(Math.Max(0, Width - 320), -100, 440, 300);
+        using var glowPath = new GraphicsPath();
+        glowPath.AddEllipse(glowBounds);
+        using var glowBrush = new PathGradientBrush(glowPath)
+        {
+            CenterColor = Color.FromArgb(SidebarMode ? 26 : 34, Theme.Accent),
+            SurroundColors = [Color.FromArgb(0, Theme.Accent)]
+        };
+        graphics.FillPath(glowBrush, glowPath);
+
+        using var hairline = new Pen(Color.FromArgb(38, Theme.GlassHighlight));
+        if (SidebarMode)
+        {
+            graphics.DrawLine(hairline, Width - 1, 0, Width - 1, Height);
+        }
+        else
+        {
+            graphics.DrawLine(hairline, 0, 0, Width, 0);
+        }
     }
 }
 

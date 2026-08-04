@@ -100,24 +100,58 @@ public sealed class ActionButton : Button
 
     protected override void OnPaintBackground(PaintEventArgs eventArgs)
     {
-        // Clear stale rounded selection pixels before drawing the current state.
         eventArgs.Graphics.Clear(BackColor);
     }
 
     protected override void OnPaint(PaintEventArgs eventArgs)
     {
-        eventArgs.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        var graphics = eventArgs.Graphics;
+        graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        graphics.CompositingMode = CompositingMode.SourceOver;
+
         var pressedInset = _pressed ? 2 : 0;
-        var bounds = new Rectangle(pressedInset, pressedInset, Width - 1 - (pressedInset * 2), Height - 1 - (pressedInset * 2));
+        var bounds = new Rectangle(
+            pressedInset,
+            pressedInset,
+            Math.Max(1, Width - 1 - (pressedInset * 2)),
+            Math.Max(1, Height - 1 - (pressedInset * 2)));
         using var path = Theme.RoundedRectangle(bounds, Theme.RadiusMd);
         var background = ResolveBackground();
-        using var brush = new SolidBrush(background);
-        using var border = new Pen(ResolveBorder(background));
-        eventArgs.Graphics.FillPath(brush, path);
-        eventArgs.Graphics.DrawPath(border, path);
+
+        if (Enabled && (Kind == ActionButtonKind.Primary || _hovered))
+        {
+            using var glowPath = new GraphicsPath();
+            glowPath.AddEllipse(new Rectangle(-24, -28, Width / 2 + 72, Height + 44));
+            using var glowBrush = new PathGradientBrush(glowPath)
+            {
+                CenterColor = Color.FromArgb(_hovered ? 48 : 24, Theme.Accent),
+                SurroundColors = [Color.FromArgb(0, Theme.Accent)]
+            };
+            graphics.FillPath(glowBrush, glowPath);
+        }
+
+        graphics.SetClip(path);
+        if (Enabled && Kind == ActionButtonKind.Primary)
+        {
+            using var gradient = new LinearGradientBrush(
+                bounds,
+                Theme.Blend(background, Color.White, 0.18f),
+                Theme.Blend(background, Theme.AccentStrong, 0.42f),
+                25f);
+            graphics.FillRectangle(gradient, bounds);
+        }
+        else
+        {
+            using var brush = new SolidBrush(background);
+            graphics.FillPath(brush, path);
+        }
+        graphics.ResetClip();
+
+        using var border = new Pen(ResolveBorder(background), Kind == ActionButtonKind.Primary ? 1f : 1.1f);
+        graphics.DrawPath(border, path);
 
         var textColor = ResolveTextColor();
-        TextRenderer.DrawText(eventArgs.Graphics, Text, Font, bounds,
+        TextRenderer.DrawText(graphics, Text, Font, bounds,
             Enabled ? textColor : Theme.TextMuted,
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter |
             TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
@@ -130,7 +164,7 @@ public sealed class ActionButton : Button
             {
                 DashStyle = DashStyle.Dot
             };
-            eventArgs.Graphics.DrawPath(focusPen, focusPath);
+            graphics.DrawPath(focusPen, focusPath);
         }
     }
 
@@ -159,24 +193,24 @@ public sealed class ActionButton : Button
     {
         if (!Enabled)
         {
-            return Theme.SurfaceRaised;
+            return Theme.CanvasRaised;
         }
 
         var normal = Kind switch
         {
-            ActionButtonKind.Primary => Theme.Accent,
+            ActionButtonKind.Primary => Theme.AccentStrong,
             ActionButtonKind.Danger => Theme.DangerSurface,
             _ => Theme.SurfaceRaised
         };
         var hovered = Kind switch
         {
-            ActionButtonKind.Primary => Theme.Blend(Theme.Accent, Color.White, 0.16f),
+            ActionButtonKind.Primary => Theme.Blend(Theme.Accent, Color.White, 0.08f),
             ActionButtonKind.Danger => Theme.Blend(Theme.DangerSurface, Theme.Danger, 0.26f),
             _ => Theme.SurfaceHover
         };
         var pressed = Kind switch
         {
-            ActionButtonKind.Primary => Theme.AccentStrong,
+            ActionButtonKind.Primary => Theme.AccentDeep,
             ActionButtonKind.Danger => Theme.Blend(Theme.DangerSurface, Color.Black, 0.18f),
             _ => Theme.SurfaceStrong
         };
@@ -185,14 +219,18 @@ public sealed class ActionButton : Button
 
     private Color ResolveBorder(Color background) => Kind switch
     {
+        ActionButtonKind.Primary => Theme.AccentSoft,
         ActionButtonKind.Secondary => _hoverProgress > 0.2f ? Theme.BorderStrong : Theme.Border,
-        ActionButtonKind.Danger => Theme.Blend(background, Theme.Danger, 0.36f),
+        ActionButtonKind.Danger => Theme.Blend(background, Theme.Danger, 0.62f),
         _ => background
     };
 
-    private Color ResolveTextColor() => Kind == ActionButtonKind.Primary
-        ? Color.White
-        : Theme.TextPrimary;
+    private Color ResolveTextColor() => Kind switch
+    {
+        ActionButtonKind.Primary => Color.White,
+        ActionButtonKind.Danger => Theme.TextPrimary,
+        _ => Theme.TextPrimary
+    };
 }
 
 public sealed class NavButton : Button
@@ -207,11 +245,11 @@ public sealed class NavButton : Button
         Label = label;
         Text = label;
         AccessibleName = label;
-        AccessibleDescription = $"\u5bfc\u822a\u5230{label}";
+        AccessibleDescription = $"导航到{label}";
         AccessibleRole = AccessibleRole.PushButton;
         FlatStyle = FlatStyle.Flat;
         FlatAppearance.BorderSize = 0;
-        BackColor = Theme.Sidebar;
+        BackColor = Theme.SidebarRaised;
         Height = 64;
         Dock = DockStyle.Top;
         Cursor = Cursors.Hand;
@@ -281,44 +319,50 @@ public sealed class NavButton : Button
 
     protected override void OnPaintBackground(PaintEventArgs eventArgs)
     {
-        // Clear stale rounded selection pixels before drawing the current state.
         eventArgs.Graphics.Clear(BackColor);
     }
 
     protected override void OnPaint(PaintEventArgs eventArgs)
     {
-        eventArgs.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        var graphics = eventArgs.Graphics;
+        graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        graphics.CompositingMode = CompositingMode.SourceOver;
         var inset = _pressed ? 2 : 0;
-        var bounds = new Rectangle(4 + inset, inset, Width - 8 - (inset * 2), Height - 1 - (inset * 2));
+        var bounds = new Rectangle(4 + inset, inset,
+            Math.Max(1, Width - 8 - (inset * 2)), Math.Max(1, Height - 1 - (inset * 2)));
 
         if (Selected || _hovered || _pressed)
         {
             using var path = Theme.RoundedRectangle(bounds, Theme.RadiusMd);
-            var fill = Selected
-                ? Theme.AccentWash
-                : _pressed ? Theme.SurfaceStrong : Theme.SurfaceHover;
-            using var background = new SolidBrush(fill);
-            eventArgs.Graphics.FillPath(background, path);
+            var top = Selected ? Theme.Blend(Theme.AccentWash, Theme.Accent, 0.2f) : Theme.SurfaceHover;
+            var bottom = Selected ? Theme.Blend(Theme.AccentDeep, Theme.Surface, 0.32f) : Theme.SurfaceStrong;
+            graphics.SetClip(path);
+            using (var gradient = new LinearGradientBrush(bounds, top, bottom, 90f))
+            {
+                graphics.FillRectangle(gradient, bounds);
+            }
+            graphics.ResetClip();
+            using var border = new Pen(Color.FromArgb(Selected ? 180 : 100, Selected ? Theme.Accent : Theme.BorderStrong));
+            graphics.DrawPath(border, path);
 
             if (Selected)
             {
-                // Left accent indicator bar
-                var barBounds = new Rectangle(bounds.Left + 2, bounds.Top + 14, 4, bounds.Height - 28);
+                var barBounds = new Rectangle(bounds.Left + 2, bounds.Top + 12, 4, Math.Max(8, bounds.Height - 24));
                 using var barPath = Theme.RoundedRectangle(barBounds, 2);
                 using var barBrush = new SolidBrush(Theme.Accent);
-                eventArgs.Graphics.FillPath(barBrush, barPath);
+                graphics.FillPath(barBrush, barPath);
             }
         }
 
-        using var iconFont = Theme.IconFont(14);
-        var iconRect = new Rectangle(26, 0, 36, Height);
-        TextRenderer.DrawText(eventArgs.Graphics, Glyph, iconFont, iconRect,
+        using var iconFont = Theme.IconFont(15);
+        var iconRect = new Rectangle(26, 0, 38, Height);
+        TextRenderer.DrawText(graphics, Glyph, iconFont, iconRect,
             Selected ? Theme.Accent : Theme.TextMuted,
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
 
         using var labelFont = Theme.Font(10.5f, Selected ? FontStyle.Bold : FontStyle.Regular);
-        var textRect = new Rectangle(76, 0, Width - 96, Height);
-        TextRenderer.DrawText(eventArgs.Graphics, Label, labelFont, textRect,
+        var textRect = new Rectangle(78, 0, Math.Max(80, Width - 100), Height);
+        TextRenderer.DrawText(graphics, Label, labelFont, textRect,
             Selected ? Theme.TextPrimary : Theme.TextSecondary,
             TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis |
             TextFormatFlags.NoPrefix);
@@ -328,7 +372,7 @@ public sealed class NavButton : Button
             var focusBounds = Rectangle.Inflate(bounds, -4, -4);
             using var focusPath = Theme.RoundedRectangle(focusBounds, Theme.RadiusSm);
             using var focusPen = new Pen(Theme.Accent) { DashStyle = DashStyle.Dot };
-            eventArgs.Graphics.DrawPath(focusPen, focusPath);
+            graphics.DrawPath(focusPen, focusPath);
         }
     }
 }

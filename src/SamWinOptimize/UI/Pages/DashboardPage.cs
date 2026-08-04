@@ -139,7 +139,7 @@ public sealed class DashboardPage : AppPage
             Width = 980,
             AutoSize = true,
             AutoSizeMode = AutoSizeMode.GrowAndShrink,
-            WrapContents = true,
+            WrapContents = false,
             BackColor = Theme.Canvas,
             Margin = new Padding(0, 0, 0, 24)
         };
@@ -331,11 +331,13 @@ public sealed class DashboardPage : AppPage
         if (metricsRow is FlowLayoutPanel row && row.Controls.Count > 0)
         {
             var gap = 12;
-            var cardWidth = (row.ClientSize.Width - (row.Controls.Count - 1) * gap) / row.Controls.Count;
-            foreach (Control card in row.Controls)
+            var availableWidth = Math.Max(640, width);
+            var cardWidth = Math.Max(160,
+                (availableWidth - ((row.Controls.Count - 1) * gap)) / row.Controls.Count);
+            for (var index = 0; index < row.Controls.Count; index++)
             {
-                card.Width = Math.Max(160, cardWidth);
-                card.Margin = new Padding(0, 0, gap, 0);
+                row.Controls[index].Width = cardWidth;
+                row.Controls[index].Margin = new Padding(0, 0, index == row.Controls.Count - 1 ? 0 : gap, 0);
             }
         }
     }
