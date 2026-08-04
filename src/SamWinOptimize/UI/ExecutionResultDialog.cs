@@ -36,7 +36,7 @@ public sealed class ExecutionResultDialog : Form
             Location = new Point(28, 28),
             Padding = new Padding(1)
         };
-        iconTile.Controls.Add(new Label
+        iconTile.Controls.Add(new BufferedLabel
         {
             Text = allSucceeded ? "\uE73E" : "\uE7BA",
             Font = Theme.IconFont(18),
@@ -45,7 +45,7 @@ public sealed class ExecutionResultDialog : Form
             TextAlign = ContentAlignment.MiddleCenter,
             Dock = DockStyle.Fill
         });
-        var titleLabel = new Label
+        var titleLabel = new BufferedLabel
         {
             Text = title,
             Font = Theme.DisplayFont(19, FontStyle.Bold),
@@ -54,7 +54,7 @@ public sealed class ExecutionResultDialog : Form
             Location = new Point(102, 26),
             BackColor = Color.Transparent
         };
-        var summaryLabel = new Label
+        var summaryLabel = new BufferedLabel
         {
             Text = $"{successCount}/{results.Count} \u9879\u6210\u529f  \u00b7  \u6bcf\u9879\u7ed3\u679c\u5df2\u5199\u5165\u672c\u5730\u6267\u884c\u8bb0\u5f55",
             Font = Theme.Font(9.5f, FontStyle.Bold),
@@ -63,7 +63,7 @@ public sealed class ExecutionResultDialog : Form
             Location = new Point(104, 64),
             BackColor = Color.Transparent
         };
-        var hintLabel = new Label
+        var hintLabel = new BufferedLabel
         {
             Text = "\u672c\u5730\u4fdd\u5b58\u5b8c\u6574\u9000\u51fa\u7801\u3001\u8f93\u51fa\u4f7f\u7528\u4fe1\u606f\uff0c\u7528\u4e8e\u590d\u6838\u4e0e\u590d\u5ba1\u3002",
             Font = Theme.Font(9),

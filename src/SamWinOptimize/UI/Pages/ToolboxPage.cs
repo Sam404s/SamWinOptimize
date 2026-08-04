@@ -69,7 +69,7 @@ public sealed class ToolboxPage : AppPage
             BackColor = Theme.Canvas,
             Margin = new Padding(0)
         };
-        header.Controls.Add(new Label
+        header.Controls.Add(new BufferedLabel
         {
             Text = title,
             Font = Theme.DisplayFont(15.5f, FontStyle.Bold),
@@ -78,7 +78,7 @@ public sealed class ToolboxPage : AppPage
             Location = new Point(0, 8),
             BackColor = Color.Transparent
         });
-        header.Controls.Add(new Label
+        header.Controls.Add(new BufferedLabel
         {
             Text = description,
             Font = Theme.Font(9.5f),
@@ -155,7 +155,7 @@ public sealed class ToolboxPage : AppPage
             Location = new Point(28, 28),
             Padding = new Padding(1)
         };
-        iconTile.Controls.Add(new Label
+        iconTile.Controls.Add(new BufferedLabel
         {
             Text = glyph,
             Font = Theme.IconFont(18),
@@ -164,7 +164,7 @@ public sealed class ToolboxPage : AppPage
             TextAlign = ContentAlignment.MiddleCenter,
             Dock = DockStyle.Fill
         });
-        var titleLabel = new Label
+        var titleLabel = new BufferedLabel
         {
             Text = title,
             Font = Theme.DisplayFont(13.5f, FontStyle.Bold),
@@ -173,7 +173,7 @@ public sealed class ToolboxPage : AppPage
             Location = new Point(102, 28),
             BackColor = Color.Transparent
         };
-        var descriptionLabel = new Label
+        var descriptionLabel = new BufferedLabel
         {
             Text = description,
             Font = Theme.Font(9.5f),

@@ -6,8 +6,8 @@ namespace SamWinOptimize.UI.Controls;
 public sealed class TaskCard : SurfacePanel
 {
     private readonly CheckBox _checkBox;
-    private readonly Label _titleLabel;
-    private readonly Label _descriptionLabel;
+    private readonly BufferedLabel _titleLabel;
+    private readonly BufferedLabel _descriptionLabel;
     private readonly BufferedFlowLayoutPanel _tags;
 
     public TaskCard(
@@ -46,7 +46,7 @@ public sealed class TaskCard : SurfacePanel
             SelectionChanged?.Invoke(this, EventArgs.Empty);
         };
 
-        _titleLabel = new Label
+        _titleLabel = new BufferedLabel
         {
             Text = title,
             Font = Theme.Font(11.5f, FontStyle.Bold),
@@ -57,7 +57,7 @@ public sealed class TaskCard : SurfacePanel
             BackColor = Color.Transparent
         };
 
-        _descriptionLabel = new Label
+        _descriptionLabel = new BufferedLabel
         {
             Text = description,
             Font = Theme.Font(9.5f),

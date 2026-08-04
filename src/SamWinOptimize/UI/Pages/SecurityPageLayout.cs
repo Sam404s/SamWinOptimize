@@ -24,7 +24,7 @@ internal static class SecurityPageLayout
             Location = new Point(30, 30),
             Padding = new Padding(1)
         };
-        iconTile.Controls.Add(new Label
+        iconTile.Controls.Add(new BufferedLabel
         {
             Text = glyph,
             Font = Theme.IconFont(19),
@@ -33,7 +33,7 @@ internal static class SecurityPageLayout
             TextAlign = ContentAlignment.MiddleCenter,
             Dock = DockStyle.Fill
         });
-        var titleLabel = new Label
+        var titleLabel = new BufferedLabel
         {
             Text = title,
             Font = Theme.DisplayFont(14.5f, FontStyle.Bold),
@@ -42,7 +42,7 @@ internal static class SecurityPageLayout
             Location = new Point(110, 28),
             BackColor = Color.Transparent
         };
-        var descriptionLabel = new Label
+        var descriptionLabel = new BufferedLabel
         {
             Text = description,
             Font = Theme.Font(9.5f),
@@ -59,7 +59,7 @@ internal static class SecurityPageLayout
         return card;
     }
 
-    public static Label CreateStatusLabel(Point location, Size size) => new()
+    public static BufferedLabel CreateStatusLabel(Point location, Size size) => new()
     {
         Text = "\u6b63\u5728\u68c0\u6d4b\u2026",
         Font = Theme.Font(9.5f, FontStyle.Bold),

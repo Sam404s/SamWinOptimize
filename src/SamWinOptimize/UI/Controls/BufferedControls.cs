@@ -4,6 +4,84 @@ using System.Runtime.InteropServices;
 
 namespace SamWinOptimize.UI.Controls;
 
+/// <summary>
+/// A single-pass, double-buffered text surface for the glass UI.
+/// Standard transparent labels can repaint their parent between layout passes;
+/// drawing the glyphs once through TextRenderer keeps the frame stable while
+/// the surrounding glass surface is resized or scrolled.
+/// </summary>
+public class BufferedLabel : Label
+{
+    public BufferedLabel()
+    {
+        AutoSize = true;
+        BackColor = Color.Transparent;
+        UseCompatibleTextRendering = false;
+        SetStyle(
+            ControlStyles.UserPaint |
+            ControlStyles.AllPaintingInWmPaint |
+            ControlStyles.OptimizedDoubleBuffer |
+            ControlStyles.ResizeRedraw |
+            ControlStyles.SupportsTransparentBackColor,
+            true);
+        DoubleBuffered = true;
+    }
+
+    protected override void OnPaint(PaintEventArgs eventArgs)
+    {
+        base.OnPaintBackground(eventArgs);
+
+        if (string.IsNullOrEmpty(Text) || ClientSize.Width <= 0 || ClientSize.Height <= 0)
+        {
+            return;
+        }
+
+        var multiline = Text.Contains('\n');
+        var flags = TextFormatFlags.NoPrefix;
+        if (!multiline)
+        {
+            flags |= TextFormatFlags.SingleLine;
+        }
+        flags |= TextAlign switch
+        {
+            ContentAlignment.TopLeft => TextFormatFlags.Top | TextFormatFlags.Left,
+            ContentAlignment.TopCenter => TextFormatFlags.Top | TextFormatFlags.HorizontalCenter,
+            ContentAlignment.TopRight => TextFormatFlags.Top | TextFormatFlags.Right,
+            ContentAlignment.MiddleLeft => TextFormatFlags.VerticalCenter | TextFormatFlags.Left,
+            ContentAlignment.MiddleCenter => TextFormatFlags.VerticalCenter | TextFormatFlags.HorizontalCenter,
+            ContentAlignment.MiddleRight => TextFormatFlags.VerticalCenter | TextFormatFlags.Right,
+            ContentAlignment.BottomLeft => TextFormatFlags.Bottom | TextFormatFlags.Left,
+            ContentAlignment.BottomCenter => TextFormatFlags.Bottom | TextFormatFlags.HorizontalCenter,
+            ContentAlignment.BottomRight => TextFormatFlags.Bottom | TextFormatFlags.Right,
+            _ => TextFormatFlags.VerticalCenter | TextFormatFlags.Left
+        };
+
+        if (AutoEllipsis && !multiline)
+        {
+            flags |= TextFormatFlags.EndEllipsis;
+        }
+
+        var bounds = new Rectangle(
+            Padding.Left,
+            Padding.Top,
+            Math.Max(1, ClientSize.Width - Padding.Horizontal),
+            Math.Max(1, ClientSize.Height - Padding.Vertical));
+        TextRenderer.DrawText(eventArgs.Graphics, Text, Font, bounds, Enabled ? ForeColor : SystemColors.GrayText, flags);
+    }
+
+    protected override void OnTextChanged(EventArgs eventArgs)
+    {
+        base.OnTextChanged(eventArgs);
+        Invalidate();
+    }
+
+    protected override void OnFontChanged(EventArgs eventArgs)
+    {
+        base.OnFontChanged(eventArgs);
+        Invalidate();
+    }
+}
+
 public class BufferedPanel : Panel
 {
     private const int WmEraseBkgnd = 0x0014;

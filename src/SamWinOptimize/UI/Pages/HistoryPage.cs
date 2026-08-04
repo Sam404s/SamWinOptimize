@@ -57,7 +57,7 @@ public sealed class HistoryPage : AppPage
             SurfaceStyle = SurfaceStyle.Raised,
             Padding = new Padding(28)
         };
-        var commandTitle = new Label
+        var commandTitle = new BufferedLabel
         {
             Text = "\u672c\u5730\u6267\u884c\u8bb0\u5f55",
             Font = Theme.DisplayFont(13.5f, FontStyle.Bold),
@@ -66,7 +66,7 @@ public sealed class HistoryPage : AppPage
             Location = new Point(28, 24),
             BackColor = Color.Transparent
         };
-        _statusLabel = new Label
+        _statusLabel = new BufferedLabel
         {
             Text = "\u5c1a\u672a\u8bfb\u53d6\u6267\u884c\u8bb0\u5f55",
             Font = Theme.Font(9.5f),
@@ -128,7 +128,7 @@ public sealed class HistoryPage : AppPage
             Radius = Theme.RadiusLg,
             SurfaceStyle = SurfaceStyle.Raised
         };
-        var detailTitle = new Label
+        var detailTitle = new BufferedLabel
         {
             Text = "\u6267\u884c\u8f93\u51fa",
             Font = Theme.DisplayFont(13, FontStyle.Bold),

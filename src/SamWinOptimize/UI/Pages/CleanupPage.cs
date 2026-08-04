@@ -49,7 +49,7 @@ public sealed class CleanupPage : AppPage
             Padding = new Padding(30),
             Radius = Theme.RadiusLg
         };
-        var noticeIcon = new Label
+        var noticeIcon = new BufferedLabel
         {
             Text = "\uE74D",
             Font = Theme.IconFont(17),
@@ -59,7 +59,7 @@ public sealed class CleanupPage : AppPage
             BackColor = Color.Transparent,
             TextAlign = ContentAlignment.MiddleLeft
         };
-        var noticeTitle = new Label
+        var noticeTitle = new BufferedLabel
         {
             Text = "\u672c\u5730\u7f13\u5b58\u6e05\u7406",
             Font = Theme.DisplayFont(13.5f, FontStyle.Bold),
@@ -68,7 +68,7 @@ public sealed class CleanupPage : AppPage
             Location = new Point(78, 26),
             BackColor = Color.Transparent
         };
-        var noticeText = new Label
+        var noticeText = new BufferedLabel
         {
             Text = "\u9ed8\u8ba4\u4e0d\u9009\u62e9\u56de\u6536\u7ad9\u3001\u4e0d\u8f6c\u79fb\u4e2a\u4eba\u5b58\u50a8\uff0c\u5220\u9664\u524d\u5148\u68c0\u67e5\u3002",
             Font = Theme.Font(9.5f),
@@ -78,7 +78,7 @@ public sealed class CleanupPage : AppPage
             Size = new Size(560, 38),
             BackColor = Color.Transparent
         };
-        _selectionLabel = new Label
+        _selectionLabel = new BufferedLabel
         {
             Font = Theme.Font(9.5f, FontStyle.Bold),
             ForeColor = Theme.TextSecondary,

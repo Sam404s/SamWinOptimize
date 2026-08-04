@@ -2,8 +2,8 @@ namespace SamWinOptimize.UI.Controls;
 
 public sealed class MetricCard : SurfacePanel
 {
-    private readonly Label _valueLabel;
-    private readonly Label _hintLabel;
+    private readonly BufferedLabel _valueLabel;
+    private readonly BufferedLabel _hintLabel;
 
     public MetricCard(string glyph, string title)
     {
@@ -13,46 +13,53 @@ public sealed class MetricCard : SurfacePanel
         SurfaceStyle = SurfaceStyle.Quiet;
         Hoverable = true;
 
-        var icon = new Label
+        var icon = new BufferedLabel
         {
             Text = glyph,
             Font = Theme.IconFont(14),
             ForeColor = Theme.Accent,
+            AutoSize = false,
             Size = new Size(32, 30),
-            Location = new Point(24, 22),
+            Location = new Point(24, 20),
             TextAlign = ContentAlignment.MiddleLeft,
             BackColor = Color.Transparent
         };
 
-        var titleLabel = new Label
+        var titleLabel = new BufferedLabel
         {
             Text = title,
             Font = Theme.Font(9, FontStyle.Bold),
             ForeColor = Theme.TextMuted,
-            AutoSize = true,
-            Location = new Point(58, 26),
+            AutoSize = false,
+            Location = new Point(58, 20),
+            Size = new Size(140, 30),
+            TextAlign = ContentAlignment.MiddleLeft,
             BackColor = Color.Transparent
         };
 
-        _valueLabel = new Label
+        _valueLabel = new BufferedLabel
         {
             Text = "\u8bfb\u53d6\u4e2d\u2026",
-            Font = Theme.DisplayFont(19, FontStyle.Bold),
+            Font = Theme.DisplayFont(15, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
             AutoEllipsis = true,
-            Location = new Point(24, 62),
-            Size = new Size(200, 40),
+            AutoSize = false,
+            TextAlign = ContentAlignment.MiddleLeft,
+            Location = new Point(24, 58),
+            Size = new Size(200, 38),
             BackColor = Color.Transparent
         };
 
-        _hintLabel = new Label
+        _hintLabel = new BufferedLabel
         {
             Text = "\u6b63\u5728\u68c0\u6d4b\u8bbe\u5907",
             Font = Theme.Font(9),
             ForeColor = Theme.TextSecondary,
             AutoEllipsis = true,
-            Location = new Point(25, 114),
-            Size = new Size(200, 28),
+            AutoSize = false,
+            TextAlign = ContentAlignment.MiddleLeft,
+            Location = new Point(25, 108),
+            Size = new Size(200, 30),
             BackColor = Color.Transparent
         };
 
@@ -62,8 +69,10 @@ public sealed class MetricCard : SurfacePanel
         Controls.Add(_hintLabel);
         Resize += (_, _) =>
         {
-            _valueLabel.Width = Math.Max(80, ClientSize.Width - 50);
-            _hintLabel.Width = Math.Max(80, ClientSize.Width - 50);
+            var textWidth = Math.Max(80, ClientSize.Width - 50);
+            _valueLabel.Width = textWidth;
+            _hintLabel.Width = textWidth;
+            _valueLabel.Font = Theme.DisplayFont(ClientSize.Width < 190 ? 13.5f : 15.5f, FontStyle.Bold);
         };
     }
 
@@ -71,5 +80,7 @@ public sealed class MetricCard : SurfacePanel
     {
         _valueLabel.Text = value;
         _hintLabel.Text = hint;
+        _valueLabel.Invalidate();
+        _hintLabel.Invalidate();
     }
 }

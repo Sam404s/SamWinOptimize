@@ -61,7 +61,7 @@ public sealed class AppsPage : AppPage
         };
         Theme.StyleTextInput(_searchBox);
         _searchBox.TextChanged += (_, _) => RenderPackages();
-        _statusLabel = new Label
+        _statusLabel = new BufferedLabel
         {
             Text = "\u5c1a\u672a\u8bfb\u53d6\u5e94\u7528\u5217\u8868",
             Font = Theme.Font(9.5f),

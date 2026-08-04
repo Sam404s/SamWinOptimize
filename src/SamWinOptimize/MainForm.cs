@@ -105,13 +105,13 @@ public sealed class MainForm : Form
         void UpdateSidebarDensity()
         {
             var compact = sidebar.ClientSize.Height < 780;
-            brand.Height = compact ? 108 : 140;
-            permissionCard.Height = compact ? 112 : 140;
+            brand.Height = compact ? 104 : 132;
+            permissionCard.Height = compact ? 136 : 152;
 
             for (var index = 0; index < nav.Controls.Count; index++)
             {
-                var gap = index == nav.Controls.Count - 1 ? 0 : compact ? 6 : 14;
-                nav.Controls[index].Height = compact ? 56 : 64;
+                var gap = index == nav.Controls.Count - 1 ? 0 : compact ? 4 : 10;
+                nav.Controls[index].Height = compact ? 50 : 60;
                 nav.Controls[index].Margin = new Padding(0, 0, 0, gap);
             }
 
@@ -128,7 +128,7 @@ public sealed class MainForm : Form
         var brand = new BackdropPanel
         {
             Dock = DockStyle.Top,
-            Height = 140,
+            Height = 132,
             BackColor = Theme.Sidebar,
             SidebarMode = true
         };
@@ -136,40 +136,50 @@ public sealed class MainForm : Form
         {
             SurfaceStyle = SurfaceStyle.Accent,
             Radius = Theme.RadiusLg,
-            Size = new Size(56, 56),
-            Location = new Point(4, 32),
+            Size = new Size(52, 52),
+            Location = new Point(4, 28),
             Padding = new Padding(1)
         };
-        markTile.Controls.Add(new Label
+        markTile.Controls.Add(new BufferedLabel
         {
             Text = "S",
-            Font = Theme.DisplayFont(22, FontStyle.Bold),
+            Font = Theme.DisplayFont(20, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
+            AutoSize = false,
             BackColor = Color.Transparent,
             TextAlign = ContentAlignment.MiddleCenter,
             Dock = DockStyle.Fill
         });
-        var name = new Label
+        var name = new BufferedLabel
         {
             Text = "SamWin",
-            Font = Theme.DisplayFont(18, FontStyle.Bold),
+            Font = Theme.DisplayFont(17, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
             AutoEllipsis = true,
+            AutoSize = false,
             TextAlign = ContentAlignment.MiddleLeft,
-            Location = new Point(74, 30),
-            Size = new Size(214, 34),
+            Location = new Point(72, 26),
+            Size = new Size(216, 34),
             BackColor = Color.Transparent
         };
-        var tagline = new Label
+        var tagline = new BufferedLabel
         {
             Text = "OPTIMIZE  ·  GLASS",
             Font = Theme.MonoFont(8.2f),
             ForeColor = Theme.TextMuted,
             AutoEllipsis = true,
+            AutoSize = false,
             TextAlign = ContentAlignment.MiddleLeft,
-            Location = new Point(76, 64),
-            Size = new Size(212, 20),
+            Location = new Point(74, 58),
+            Size = new Size(214, 22),
             BackColor = Color.Transparent
+        };
+        brand.Resize += (_, _) =>
+        {
+            var compact = brand.ClientSize.Height < 120;
+            markTile.Location = new Point(4, compact ? 20 : 28);
+            name.Location = new Point(72, compact ? 18 : 26);
+            tagline.Location = new Point(74, compact ? 50 : 58);
         };
         brand.Controls.Add(markTile);
         brand.Controls.Add(name);
@@ -182,37 +192,41 @@ public sealed class MainForm : Form
         var card = new SurfacePanel
         {
             Dock = DockStyle.Bottom,
-            Height = 140,
+            Height = 152,
             SurfaceStyle = SurfaceStyle.Accent,
             Radius = Theme.RadiusLg,
             Padding = new Padding(22, 18, 22, 18)
         };
-        var glyph = new Label
+        var glyph = new BufferedLabel
         {
             Text = "\uE72E",
             Font = Theme.IconFont(16),
             ForeColor = Theme.Success,
-            Size = new Size(36, 36),
-            Location = new Point(20, 20),
+            Size = new Size(36, 34),
+            Location = new Point(20, 16),
             TextAlign = ContentAlignment.MiddleCenter,
             BackColor = Color.Transparent
         };
-        var title = new Label
+        var title = new BufferedLabel
         {
             Text = "\u672c\u5730\u6267\u884c\u6a21\u5f0f",
             Font = Theme.Font(10, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
-            AutoSize = true,
-            Location = new Point(22, 62),
+            AutoSize = false,
+            TextAlign = ContentAlignment.MiddleLeft,
+            Location = new Point(22, 52),
+            Size = new Size(220, 28),
             BackColor = Color.Transparent
         };
-        var detail = new Label
+        var detail = new BufferedLabel
         {
             Text = "\u6240\u6709\u64cd\u4f5c\u4ec5\u5728\u6b64\u8bbe\u5907\u8fd0\u884c\uff0c\n\u4e0d\u4e0a\u4f20\u4efb\u4f55\u6570\u636e\u5230\u7f51\u7edc\u3002",
             Font = Theme.Font(8.8f),
             ForeColor = Theme.TextSecondary,
-            Location = new Point(22, 88),
-            Size = new Size(220, 48),
+            AutoSize = false,
+            TextAlign = ContentAlignment.MiddleLeft,
+            Location = new Point(22, 80),
+            Size = new Size(220, 44),
             BackColor = Color.Transparent
         };
         card.Controls.Add(glyph);
@@ -230,20 +244,22 @@ public sealed class MainForm : Form
             BackColor = Theme.CanvasSoft,
             Padding = new Padding(32, 0, 32, 0)
         };
-        var privacyStatus = new Label
+        var privacyStatus = new BufferedLabel
         {
             Text = "\u25cf  \u672c\u5730\u6267\u884c  \u00b7  \u8bbe\u5907\u6570\u636e\u4e0d\u79bb\u5f00\u672c\u673a",
             Font = Theme.Font(8.5f, FontStyle.Bold),
             ForeColor = Theme.Success,
+            AutoSize = false,
             Dock = DockStyle.Left,
             Width = 340,
             TextAlign = ContentAlignment.MiddleLeft
         };
-        _routeStatus = new Label
+        _routeStatus = new BufferedLabel
         {
             Text = "\u8bbe\u5907\u603b\u89c8",
             Font = Theme.MonoFont(8),
             ForeColor = Theme.TextMuted,
+            AutoSize = false,
             Dock = DockStyle.Right,
             Width = 340,
             TextAlign = ContentAlignment.MiddleRight

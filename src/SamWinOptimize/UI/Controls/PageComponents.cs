@@ -2,7 +2,7 @@ using System.Drawing.Drawing2D;
 
 namespace SamWinOptimize.UI.Controls;
 
-public sealed class StatusPill : Label
+public sealed class StatusPill : BufferedLabel
 {
     public StatusPill(string text, Color color)
     {
@@ -30,11 +30,11 @@ public sealed class StatusPill : Label
 
 public sealed class PageHeader : Panel
 {
-    private readonly Label _descriptionLabel;
+    private readonly BufferedLabel _descriptionLabel;
 
     public PageHeader(string glyph, string title, string description)
     {
-        Height = 146;
+        Height = 136;
         Dock = DockStyle.Top;
         BackColor = Color.Transparent;
         Padding = new Padding(0, 0, 0, 30);
@@ -45,11 +45,11 @@ public sealed class PageHeader : Panel
         {
             SurfaceStyle = SurfaceStyle.Accent,
             Radius = Theme.RadiusXl,
-            Size = new Size(70, 70),
+            Size = new Size(64, 64),
             Location = new Point(0, 8),
             Padding = new Padding(1)
         };
-        iconTile.Controls.Add(new Label
+        iconTile.Controls.Add(new BufferedLabel
         {
             Text = glyph,
             Font = Theme.IconFont(22),
@@ -59,7 +59,7 @@ public sealed class PageHeader : Panel
             Dock = DockStyle.Fill
         });
 
-        var eyebrow = new Label
+        var eyebrow = new BufferedLabel
         {
             Text = "SAM / CONTROL PLANE",
             Font = Theme.MonoFont(8, FontStyle.Bold),
@@ -69,24 +69,28 @@ public sealed class PageHeader : Panel
             BackColor = Color.Transparent
         };
 
-        var titleLabel = new Label
+        var titleLabel = new BufferedLabel
         {
             Text = title,
-            Font = Theme.DisplayFont(26, FontStyle.Bold),
+            Font = Theme.DisplayFont(22, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
-            AutoSize = true,
-            Location = new Point(94, 20),
+            AutoSize = false,
+            TextAlign = ContentAlignment.MiddleLeft,
+            Location = new Point(94, 16),
+            Size = new Size(360, 42),
             BackColor = Color.Transparent
         };
 
-        _descriptionLabel = new Label
+        _descriptionLabel = new BufferedLabel
         {
             Text = description,
             Font = Theme.Font(10.5f),
             ForeColor = Theme.TextSecondary,
             AutoEllipsis = true,
-            Location = new Point(96, 66),
-            Size = new Size(700, 34),
+            AutoSize = false,
+            TextAlign = ContentAlignment.MiddleLeft,
+            Location = new Point(96, 61),
+            Size = new Size(700, 30),
             BackColor = Color.Transparent
         };
 
@@ -107,7 +111,8 @@ public sealed class PageHeader : Panel
         Controls.Add(_descriptionLabel);
         Resize += (_, _) =>
         {
-            var rightLimit = Math.Max(260, Width - ActionHost.Width - 118);
+            var rightLimit = Math.Max(240, Width - ActionHost.Width - 118);
+            titleLabel.Width = rightLimit;
             _descriptionLabel.Width = rightLimit;
         };
     }
@@ -124,7 +129,7 @@ public sealed class EmptyState : SurfacePanel
         SurfaceStyle = SurfaceStyle.Quiet;
         Padding = new Padding(48);
 
-        var icon = new Label
+        var icon = new BufferedLabel
         {
             Text = glyph,
             Font = Theme.IconFont(32),
@@ -134,17 +139,17 @@ public sealed class EmptyState : SurfacePanel
             Height = 100,
             BackColor = Color.Transparent
         };
-        var titleLabel = new Label
+        var titleLabel = new BufferedLabel
         {
             Text = title,
-            Font = Theme.DisplayFont(16, FontStyle.Bold),
+            Font = Theme.DisplayFont(15, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
             TextAlign = ContentAlignment.MiddleCenter,
             Dock = DockStyle.Top,
-            Height = 52,
+            Height = 48,
             BackColor = Color.Transparent
         };
-        var descriptionLabel = new Label
+        var descriptionLabel = new BufferedLabel
         {
             Text = description,
             Font = Theme.Font(10.2f),

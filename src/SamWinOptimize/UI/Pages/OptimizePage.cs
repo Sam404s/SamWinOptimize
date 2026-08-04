@@ -94,7 +94,7 @@ public sealed class OptimizePage : AppPage
         _categoryBox.Items.AddRange(OptimizationCatalog.All.Select(action => action.Category).Distinct().Cast<object>().ToArray());
         _categoryBox.SelectedIndex = 0;
         _categoryBox.SelectedIndexChanged += (_, _) => RenderTasks();
-        _selectionLabel = new Label
+        _selectionLabel = new BufferedLabel
         {
             Font = Theme.Font(9.5f, FontStyle.Bold),
             ForeColor = Theme.TextSecondary,
