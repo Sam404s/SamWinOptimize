@@ -72,9 +72,10 @@ public sealed class PageHeader : Panel
         var titleLabel = new BufferedLabel
         {
             Text = title,
-            Font = Theme.DisplayFont(22, FontStyle.Bold),
+            Font = Theme.DisplayFont(20.5f, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
             AutoSize = false,
+            AutoEllipsis = true,
             TextAlign = ContentAlignment.MiddleLeft,
             Location = new Point(94, 16),
             Size = new Size(360, 42),
@@ -97,7 +98,9 @@ public sealed class PageHeader : Panel
         ActionHost = new FlowLayoutPanel
         {
             Dock = DockStyle.Right,
-            Width = 440,
+            AutoSize = true,
+            AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            Width = 0,
             FlowDirection = FlowDirection.RightToLeft,
             WrapContents = false,
             Padding = new Padding(0, 20, 0, 0),
@@ -109,12 +112,18 @@ public sealed class PageHeader : Panel
         Controls.Add(iconTile);
         Controls.Add(titleLabel);
         Controls.Add(_descriptionLabel);
-        Resize += (_, _) =>
+        void ResizeTextBounds()
         {
-            var rightLimit = Math.Max(240, Width - ActionHost.Width - 118);
+            var rightLimit = Math.Max(220, Width - ActionHost.Width - 118);
             titleLabel.Width = rightLimit;
             _descriptionLabel.Width = rightLimit;
-        };
+        }
+
+        Resize += (_, _) => ResizeTextBounds();
+        ActionHost.SizeChanged += (_, _) => ResizeTextBounds();
+        ActionHost.ControlAdded += (_, _) => ResizeTextBounds();
+        ActionHost.ControlRemoved += (_, _) => ResizeTextBounds();
+        ResizeTextBounds();
     }
 
     public FlowLayoutPanel ActionHost { get; }

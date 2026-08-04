@@ -71,8 +71,10 @@ public sealed class AboutPage : AppPage
             Text = "SamWinOptimize",
             Font = Theme.DisplayFont(26, FontStyle.Bold),
             ForeColor = Theme.TextPrimary,
-            AutoSize = true,
-            Location = new Point(144, 38),
+            AutoSize = false,
+            AutoEllipsis = true,
+            Location = new Point(144, 28),
+            Size = new Size(700, 58),
             BackColor = Color.Transparent
         };
         var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "1.0.0";
@@ -81,15 +83,19 @@ public sealed class AboutPage : AppPage
             Text = $"VERSION {version}  /  .NET {Environment.Version.Major}  /  WINDOWS X64 \u00b7 ARM64",
             Font = Theme.MonoFont(8.2f, FontStyle.Bold),
             ForeColor = Theme.Accent,
-            AutoSize = true,
-            Location = new Point(146, 88),
+            AutoSize = false,
+            AutoEllipsis = true,
+            Location = new Point(146, 98),
+            Size = new Size(700, 22),
             BackColor = Color.Transparent
         };
         var description = new BufferedLabel
         {
             Text = "\u7b80\u5355\u4e0d\u610f\u5473\u7740\u7c97\u7cd9\u3002\u6bcf\u4e2a\u7cfb\u7edf\u64cd\u4f5c\u90fd\u6709\u660e\u786e\u610f\u56fe\u3001\u98ce\u9669\u7b49\u7ea7\u3001\u7ba1\u7406\u5458\u8fb9\u754c\u548c\u9000\u51fa\u51b2\u7a81\u539f\u8def\u5f84\u3002",
-            Font = Theme.Font(11.2f),
+            Font = Theme.Font(10.5f),
             ForeColor = Theme.TextSecondary,
+            AutoSize = false,
+            WordWrap = true,
             Location = new Point(38, 152),
             Size = new Size(840, 68),
             BackColor = Color.Transparent
@@ -108,7 +114,13 @@ public sealed class AboutPage : AppPage
         hero.Controls.Add(metadata);
         hero.Controls.Add(description);
         hero.Controls.Add(promise);
-        hero.Resize += (_, _) => description.Width = Math.Max(520, hero.ClientSize.Width - 76);
+        hero.Resize += (_, _) =>
+        {
+            var textWidth = Math.Max(420, hero.ClientSize.Width - 76);
+            title.Width = Math.Max(240, hero.ClientSize.Width - 180);
+            metadata.Width = Math.Max(240, hero.ClientSize.Width - 184);
+            description.Width = textWidth;
+        };
         return hero;
     }
 

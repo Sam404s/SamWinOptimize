@@ -27,6 +27,9 @@ public class BufferedLabel : Label
         DoubleBuffered = true;
     }
 
+    [DefaultValue(false)]
+    public bool WordWrap { get; set; }
+
     protected override void OnPaint(PaintEventArgs eventArgs)
     {
         base.OnPaintBackground(eventArgs);
@@ -38,7 +41,7 @@ public class BufferedLabel : Label
 
         var multiline = Text.Contains('\n');
         var flags = TextFormatFlags.NoPrefix;
-        if (!multiline)
+        if (!multiline && !WordWrap)
         {
             flags |= TextFormatFlags.SingleLine;
         }
@@ -56,7 +59,11 @@ public class BufferedLabel : Label
             _ => TextFormatFlags.VerticalCenter | TextFormatFlags.Left
         };
 
-        if (AutoEllipsis && !multiline)
+        if (WordWrap && !AutoEllipsis)
+        {
+            flags |= TextFormatFlags.WordBreak;
+        }
+        else if (AutoEllipsis && !multiline)
         {
             flags |= TextFormatFlags.EndEllipsis;
         }
