@@ -58,7 +58,10 @@ public sealed class CleanupPage : AppPage
             Padding = new Padding(0),
             ColumnCount = 4,
             RowCount = 1,
-            GrowStyle = TableLayoutPanelGrowStyle.FixedSize
+            // AddRows is intentionally used for a dynamically reconfigured
+            // command deck. It prevents WinForms from throwing while the
+            // responsive cell map is being rebuilt during a resize.
+            GrowStyle = TableLayoutPanelGrowStyle.AddRows
         };
         var noticeIcon = new BufferedLabel
         {
@@ -121,10 +124,6 @@ public sealed class CleanupPage : AppPage
         };
         _runButton.Click += async (_, _) => await RunCleanupAsync();
         commandDeck.Controls.Add(commandLayout);
-        commandLayout.Controls.Add(noticeIcon);
-        commandLayout.Controls.Add(noticeContent);
-        commandLayout.Controls.Add(_selectionLabel);
-        commandLayout.Controls.Add(_runButton);
         commandDeck.Resize += (_, _) => LayoutCommandDeck(commandDeck, commandLayout, noticeIcon, noticeContent, noticeText);
 
         _taskList = new BufferedScrollablePanel
@@ -158,6 +157,11 @@ public sealed class CleanupPage : AppPage
         try
         {
             commandDeck.Height = compact ? 158 : 118;
+
+            // Rebuild the table while it tolerates transient cell positions.
+            // The layout is resized repeatedly, so AddRows is kept active for
+            // the whole lifecycle instead of briefly switching to FixedSize.
+            commandLayout.GrowStyle = TableLayoutPanelGrowStyle.AddRows;
             commandLayout.Controls.Clear();
             commandLayout.RowStyles.Clear();
             commandLayout.ColumnStyles.Clear();
