@@ -129,7 +129,7 @@ public sealed class AboutPage : AppPage
         var panel = new SurfacePanel
         {
             Width = 980,
-            Height = 308,
+            Height = 334,
             Padding = new Padding(32),
             SurfaceStyle = SurfaceStyle.Raised,
             Margin = new Padding(0, 0, 0, 28)
@@ -149,7 +149,7 @@ public sealed class AboutPage : AppPage
             ColumnCount = 3,
             RowCount = 1,
             Location = new Point(32, 106),
-            Size = new Size(920, 172),
+            Size = new Size(920, 198),
             BackColor = Color.Transparent,
             Margin = new Padding(0),
             Padding = new Padding(0)
@@ -244,7 +244,11 @@ public sealed class AboutPage : AppPage
             Font = Theme.Font(9.2f),
             ForeColor = Theme.TextSecondary,
             Location = new Point(22, 90),
-            Size = new Size(250, 62),
+            Size = new Size(250, 84),
+            AutoSize = false,
+            WordWrap = true,
+            AutoEllipsis = false,
+            TextAlign = ContentAlignment.TopLeft,
             BackColor = Color.Transparent
         };
         card.Controls.Add(body);

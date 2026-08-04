@@ -34,7 +34,7 @@ public sealed class PageHeader : Panel
 
     public PageHeader(string glyph, string title, string description)
     {
-        Height = 136;
+        Height = 150;
         Dock = DockStyle.Top;
         BackColor = Color.Transparent;
         Padding = new Padding(0, 0, 0, 30);
@@ -87,11 +87,12 @@ public sealed class PageHeader : Panel
             Text = description,
             Font = Theme.Font(10.5f),
             ForeColor = Theme.TextSecondary,
-            AutoEllipsis = true,
+            AutoEllipsis = false,
             AutoSize = false,
-            TextAlign = ContentAlignment.MiddleLeft,
+            WordWrap = true,
+            TextAlign = ContentAlignment.TopLeft,
             Location = new Point(96, 61),
-            Size = new Size(700, 30),
+            Size = new Size(700, 48),
             BackColor = Color.Transparent
         };
 

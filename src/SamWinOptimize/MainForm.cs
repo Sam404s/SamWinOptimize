@@ -80,7 +80,7 @@ public sealed class MainForm : Form
         var nav = new BufferedFlowLayoutPanel
         {
             Dock = DockStyle.Top,
-            AutoSize = true,
+            AutoSize = false,
             AutoSizeMode = AutoSizeMode.GrowAndShrink,
             FlowDirection = FlowDirection.TopDown,
             WrapContents = false,
@@ -104,18 +104,31 @@ public sealed class MainForm : Form
 
         void UpdateSidebarDensity()
         {
-            var compact = sidebar.ClientSize.Height < 780;
-            brand.Height = compact ? 104 : 132;
-            permissionCard.Height = compact ? 136 : 152;
+            var availableHeight = Math.Max(0, sidebar.ClientSize.Height - sidebar.Padding.Vertical);
+            var compact = availableHeight < 720;
+            var brandHeight = compact ? 96 : 124;
+            var permissionHeight = compact ? 122 : 144;
+            var navHeight = Math.Max(1, availableHeight - brandHeight - permissionHeight);
+            var gap = compact ? 2 : 6;
+            var itemHeight = Math.Clamp(
+                (navHeight - (gap * Math.Max(0, nav.Controls.Count - 1))) / Math.Max(1, nav.Controls.Count),
+                compact ? 42 : 48,
+                compact ? 52 : 60);
+
+            brand.Height = brandHeight;
+            permissionCard.Height = permissionHeight;
+            nav.Height = navHeight;
 
             for (var index = 0; index < nav.Controls.Count; index++)
             {
-                var gap = index == nav.Controls.Count - 1 ? 0 : compact ? 4 : 10;
-                nav.Controls[index].Height = compact ? 50 : 60;
-                nav.Controls[index].Margin = new Padding(0, 0, 0, gap);
+                var button = nav.Controls[index];
+                button.Width = Math.Max(1, nav.ClientSize.Width);
+                button.Height = itemHeight;
+                button.Margin = new Padding(0, 0, 0, index == nav.Controls.Count - 1 ? 0 : gap);
             }
 
             nav.PerformLayout();
+            sidebar.Invalidate(invalidateChildren: true);
         }
 
         sidebar.SizeChanged += (_, _) => UpdateSidebarDensity();
@@ -192,18 +205,18 @@ public sealed class MainForm : Form
         var card = new SurfacePanel
         {
             Dock = DockStyle.Bottom,
-            Height = 152,
+            Height = 144,
             SurfaceStyle = SurfaceStyle.Accent,
             Radius = Theme.RadiusLg,
-            Padding = new Padding(22, 18, 22, 18)
+            Padding = new Padding(18, 14, 18, 14)
         };
         var glyph = new BufferedLabel
         {
             Text = "\uE72E",
             Font = Theme.IconFont(16),
             ForeColor = Theme.Success,
-            Size = new Size(36, 34),
-            Location = new Point(20, 16),
+            Size = new Size(34, 32),
+            Location = new Point(18, 14),
             TextAlign = ContentAlignment.MiddleCenter,
             BackColor = Color.Transparent
         };
@@ -214,8 +227,8 @@ public sealed class MainForm : Form
             ForeColor = Theme.TextPrimary,
             AutoSize = false,
             TextAlign = ContentAlignment.MiddleLeft,
-            Location = new Point(22, 52),
-            Size = new Size(220, 28),
+            Location = new Point(22, 48),
+            Size = new Size(220, 26),
             BackColor = Color.Transparent
         };
         var detail = new BufferedLabel
@@ -225,13 +238,25 @@ public sealed class MainForm : Form
             ForeColor = Theme.TextSecondary,
             AutoSize = false,
             TextAlign = ContentAlignment.MiddleLeft,
-            Location = new Point(22, 80),
-            Size = new Size(220, 44),
+            Location = new Point(22, 76),
+            Size = new Size(220, 42),
             BackColor = Color.Transparent
         };
         card.Controls.Add(glyph);
         card.Controls.Add(title);
         card.Controls.Add(detail);
+        card.Resize += (_, _) =>
+        {
+            var compact = card.ClientSize.Height < 136;
+            glyph.Location = new Point(18, compact ? 12 : 14);
+            title.Location = new Point(22, compact ? 44 : 48);
+            title.Height = compact ? 24 : 26;
+            detail.Location = new Point(22, title.Bottom + 2);
+            detail.Size = new Size(
+                Math.Max(120, card.ClientSize.Width - 44),
+                Math.Max(30, card.ClientSize.Height - detail.Top - 10));
+            detail.Font = Theme.Font(compact ? 8.35f : 8.8f);
+        };
         return card;
     }
 

@@ -107,16 +107,16 @@ public class BufferedPanel : Panel
 
     protected override void OnPaintBackground(PaintEventArgs eventArgs)
     {
-        // Clear the complete surface in one pass. The default Panel background
-        // path can leave the previous child-window frame visible during the
-        // first layout pass, which is the source of the sidebar ghosting.
-        var background = BackColor;
-        if (background == Color.Transparent && Parent is not null)
+        // Let WinForms ask the painted parent for the transparent backdrop.
+        // Clearing with the parent's BackColor would flatten a glass gradient
+        // into a dark rectangle behind nested content.
+        if (BackColor == Color.Transparent)
         {
-            background = Parent.BackColor;
+            base.OnPaintBackground(eventArgs);
+            return;
         }
 
-        eventArgs.Graphics.Clear(background);
+        eventArgs.Graphics.Clear(BackColor);
     }
 
     protected override void WndProc(ref Message message)
@@ -194,6 +194,12 @@ public sealed class BufferedTableLayoutPanel : TableLayoutPanel
 
     protected override void OnPaintBackground(PaintEventArgs eventArgs)
     {
+        if (BackColor == Color.Transparent)
+        {
+            base.OnPaintBackground(eventArgs);
+            return;
+        }
+
         eventArgs.Graphics.Clear(BackColor);
     }
 }
@@ -229,6 +235,12 @@ public sealed class BufferedFlowLayoutPanel : FlowLayoutPanel
 
     protected override void OnPaintBackground(PaintEventArgs eventArgs)
     {
+        if (BackColor == Color.Transparent)
+        {
+            base.OnPaintBackground(eventArgs);
+            return;
+        }
+
         eventArgs.Graphics.Clear(BackColor);
     }
 }

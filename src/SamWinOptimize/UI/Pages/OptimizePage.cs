@@ -10,8 +10,8 @@ public sealed class OptimizePage : AppPage
     private readonly ReceiptStore _receiptStore;
     private readonly HashSet<string> _selectedIds = [];
     private readonly Panel _taskList;
-    private readonly TextBox _searchBox;
-    private readonly ComboBox _categoryBox;
+    private readonly GlassTextBox _searchBox;
+    private readonly GlassSelect _categoryBox;
     private readonly Label _selectionLabel;
     private readonly ActionButton _applyButton;
 
@@ -63,35 +63,24 @@ public sealed class OptimizePage : AppPage
             Radius = Theme.RadiusLg,
             SurfaceStyle = SurfaceStyle.Raised
         };
-        _searchBox = new TextBox
+        _searchBox = new GlassTextBox
         {
-            PlaceholderText = "\u641c\u7d22\u540d\u79f0\u6216\u8bf4\u660e",
-            AccessibleName = "\u641c\u7d22\u4f18\u5316\u9879",
-            AccessibleDescription = "\u6309\u540d\u79f0\u6216\u8bf4\u660e\u7b5b\u9009\u4f18\u5316\u9879\u76ee",
-            Font = Theme.Font(10),
-            ForeColor = Theme.TextPrimary,
-            BackColor = Theme.Surface,
-            BorderStyle = BorderStyle.FixedSingle,
-            Location = new Point(28, 32),
-            Size = new Size(350, 38)
+            PlaceholderText = "搜索名称或说明",
+            AccessibleName = "搜索优化项",
+            AccessibleDescription = "按名称或说明筛选优化项目",
+            Location = new Point(28, 31),
+            Size = new Size(350, 42)
         };
-        Theme.StyleTextInput(_searchBox);
         _searchBox.TextChanged += (_, _) => RenderTasks();
-        _categoryBox = new ComboBox
+        _categoryBox = new GlassSelect
         {
-            AccessibleName = "\u4f18\u5316\u5206\u7c7b",
-            AccessibleDescription = "\u6309\u5206\u7c7b\u7b5b\u9009\u4f18\u5316\u9879\u76ee",
-            DropDownStyle = ComboBoxStyle.DropDownList,
-            Font = Theme.Font(9.5f),
-            ForeColor = Theme.TextPrimary,
-            BackColor = Theme.Surface,
-            FlatStyle = FlatStyle.Flat,
+            AccessibleName = "优化分类",
+            AccessibleDescription = "按分类筛选优化项目",
             Location = new Point(394, 31),
-            Size = new Size(180, 40)
+            Size = new Size(180, 42)
         };
-        Theme.StyleDropDown(_categoryBox);
-        _categoryBox.Items.Add("\u5168\u90e8\u5206\u7c7b");
-        _categoryBox.Items.AddRange(OptimizationCatalog.All.Select(action => action.Category).Distinct().Cast<object>().ToArray());
+        _categoryBox.AddItem("全部分类");
+        _categoryBox.AddItems(OptimizationCatalog.All.Select(action => action.Category).Distinct());
         _categoryBox.SelectedIndex = 0;
         _categoryBox.SelectedIndexChanged += (_, _) => RenderTasks();
         _selectionLabel = new BufferedLabel

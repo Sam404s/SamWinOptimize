@@ -24,7 +24,7 @@ public sealed class ActionButton : Button
         FlatAppearance.BorderSize = 0;
         Font = Theme.Font(10, FontStyle.Bold);
         ForeColor = Theme.TextPrimary;
-        BackColor = Theme.Canvas;
+        BackColor = Color.Transparent;
         Height = 48;
         Padding = new Padding(22, 0, 22, 0);
         Cursor = Cursors.Hand;
@@ -103,19 +103,33 @@ public sealed class ActionButton : Button
 
     protected override void OnPaintBackground(PaintEventArgs eventArgs)
     {
+        // Preserve the glass surface painted by the parent. A solid canvas
+        // clear here creates dark rectangles around buttons placed on cards.
+        if (BackColor == Color.Transparent)
+        {
+            base.OnPaintBackground(eventArgs);
+            return;
+        }
+
         eventArgs.Graphics.Clear(BackColor);
     }
 
     protected override void OnPaint(PaintEventArgs eventArgs)
     {
         var graphics = eventArgs.Graphics;
-        // Always reset the complete backing surface before drawing the current
-        // visual state. Button invalidation does not consistently raise a
-        // separate erase pass after state changes, which otherwise leaves the
-        // previous text/glow frame behind the new one.
-        graphics.CompositingMode = CompositingMode.SourceCopy;
-        graphics.Clear(BackColor);
-        graphics.CompositingMode = CompositingMode.SourceOver;
+        // Repaint the current parent backdrop before drawing the button state.
+        // This keeps hover/pressed transitions single-pass and prevents stale
+        // glyphs or previous glow frames from surviving an invalidation.
+        if (BackColor == Color.Transparent)
+        {
+            base.OnPaintBackground(eventArgs);
+        }
+        else
+        {
+            graphics.CompositingMode = CompositingMode.SourceCopy;
+            graphics.Clear(BackColor);
+            graphics.CompositingMode = CompositingMode.SourceOver;
+        }
         graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
         var pressedInset = _pressed ? 2 : 0;
@@ -163,16 +177,14 @@ public sealed class ActionButton : Button
         TextRenderer.DrawText(graphics, Text, Font, bounds,
             Enabled ? textColor : Theme.TextMuted,
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter |
-            TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
+            TextFormatFlags.SingleLine | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
 
         if (Focused && ShowFocusCues)
         {
             var focusBounds = Rectangle.Inflate(bounds, -4, -4);
             using var focusPath = Theme.RoundedRectangle(focusBounds, Theme.RadiusSm);
-            using var focusPen = new Pen(Kind == ActionButtonKind.Primary ? Color.White : Theme.Accent)
-            {
-                DashStyle = DashStyle.Dot
-            };
+            using var focusPen = new Pen(
+                Color.FromArgb(190, Kind == ActionButtonKind.Primary ? Color.White : Theme.Accent), 1f);
             graphics.DrawPath(focusPen, focusPath);
         }
     }
@@ -240,6 +252,122 @@ public sealed class ActionButton : Button
         ActionButtonKind.Danger => Theme.TextPrimary,
         _ => Theme.TextPrimary
     };
+}
+
+public sealed class SelectionCheckBox : CheckBox
+{
+    private bool _hovered;
+    private bool _pressed;
+
+    public SelectionCheckBox()
+    {
+        AutoSize = false;
+        Appearance = Appearance.Normal;
+        FlatStyle = FlatStyle.Flat;
+        FlatAppearance.BorderSize = 0;
+        Text = string.Empty;
+        BackColor = Color.Transparent;
+        Cursor = Cursors.Hand;
+        TabStop = true;
+        SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint |
+                 ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw |
+                 ControlStyles.SupportsTransparentBackColor, true);
+        DoubleBuffered = true;
+        UpdateStyles();
+    }
+
+    protected override void OnMouseEnter(EventArgs eventArgs)
+    {
+        _hovered = true;
+        Invalidate();
+        base.OnMouseEnter(eventArgs);
+    }
+
+    protected override void OnMouseLeave(EventArgs eventArgs)
+    {
+        _hovered = false;
+        _pressed = false;
+        Invalidate();
+        base.OnMouseLeave(eventArgs);
+    }
+
+    protected override void OnMouseDown(MouseEventArgs eventArgs)
+    {
+        if (eventArgs.Button == MouseButtons.Left)
+        {
+            _pressed = true;
+            Invalidate();
+        }
+        base.OnMouseDown(eventArgs);
+    }
+
+    protected override void OnMouseUp(MouseEventArgs eventArgs)
+    {
+        _pressed = false;
+        Invalidate();
+        base.OnMouseUp(eventArgs);
+    }
+
+    protected override void OnCheckedChanged(EventArgs eventArgs)
+    {
+        Invalidate();
+        base.OnCheckedChanged(eventArgs);
+    }
+
+    protected override void OnPaintBackground(PaintEventArgs eventArgs)
+    {
+        if (BackColor == Color.Transparent)
+        {
+            base.OnPaintBackground(eventArgs);
+            return;
+        }
+
+        eventArgs.Graphics.Clear(BackColor);
+    }
+
+    protected override void OnPaint(PaintEventArgs eventArgs)
+    {
+        var graphics = eventArgs.Graphics;
+        graphics.CompositingMode = CompositingMode.SourceOver;
+        graphics.SmoothingMode = SmoothingMode.AntiAlias;
+
+        var size = Math.Min(22, Math.Max(16, Math.Min(ClientSize.Width, ClientSize.Height) - 8));
+        var bounds = new Rectangle(
+            Math.Max(2, (ClientSize.Width - size) / 2),
+            Math.Max(2, (ClientSize.Height - size) / 2),
+            size,
+            size);
+        using var path = Theme.RoundedRectangle(bounds, 5);
+        var fill = Checked
+            ? (_pressed ? Theme.AccentDeep : Theme.AccentStrong)
+            : (_hovered ? Theme.SurfaceHover : Theme.SurfaceRaised);
+        using var brush = new SolidBrush(fill);
+        graphics.FillPath(brush, path);
+        using var border = new Pen(Checked || _hovered ? Theme.Accent : Theme.BorderStrong, 1f);
+        graphics.DrawPath(border, path);
+
+        if (Checked)
+        {
+            using var tick = new Pen(Color.White, 2f)
+            {
+                StartCap = LineCap.Round,
+                EndCap = LineCap.Round,
+                LineJoin = LineJoin.Round
+            };
+            graphics.DrawLines(tick,
+            [
+                new Point(bounds.Left + 5, bounds.Top + bounds.Height / 2),
+                new Point(bounds.Left + 9, bounds.Bottom - 5),
+                new Point(bounds.Right - 4, bounds.Top + 5)
+            ]);
+        }
+
+        if (Focused && ShowFocusCues)
+        {
+            using var focusPen = new Pen(Color.FromArgb(190, Theme.AccentSoft), 1f);
+            graphics.DrawPath(focusPen, Theme.RoundedRectangle(Rectangle.Inflate(bounds, 3, 3), 7));
+        }
+    }
 }
 
 public sealed class NavButton : Button
@@ -390,14 +518,14 @@ public sealed class NavButton : Button
         var textRect = new Rectangle(78, 0, Math.Max(80, Width - 100), Height);
         TextRenderer.DrawText(graphics, Label, labelFont, textRect,
             Selected ? Theme.TextPrimary : Theme.TextSecondary,
-            TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis |
-            TextFormatFlags.NoPrefix);
+            TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine |
+            TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
 
         if (Focused && ShowFocusCues)
         {
             var focusBounds = Rectangle.Inflate(bounds, -4, -4);
             using var focusPath = Theme.RoundedRectangle(focusBounds, Theme.RadiusSm);
-            using var focusPen = new Pen(Theme.Accent) { DashStyle = DashStyle.Dot };
+            using var focusPen = new Pen(Color.FromArgb(190, Theme.Accent), 1f);
             graphics.DrawPath(focusPen, focusPath);
         }
     }

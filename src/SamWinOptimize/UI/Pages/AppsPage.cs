@@ -9,7 +9,7 @@ public sealed class AppsPage : AppPage
     private readonly AppPackageService _appPackageService;
     private readonly ReceiptStore _receiptStore;
     private readonly BufferedDataGridView _grid;
-    private readonly TextBox _searchBox;
+    private readonly GlassTextBox _searchBox;
     private readonly Label _statusLabel;
     private readonly ActionButton _uninstallButton;
     private IReadOnlyList<AppPackageInfo> _packages = [];
@@ -49,17 +49,14 @@ public sealed class AppsPage : AppPage
             SurfaceStyle = SurfaceStyle.Raised,
             Padding = new Padding(28, 24, 28, 24)
         };
-        _searchBox = new TextBox
+        _searchBox = new GlassTextBox
         {
             PlaceholderText = "\u6309\u5e94\u7528\u540d\u79f0\u6216\u6807\u8bc6\u641c\u7d22",
-            Font = Theme.Font(10),
-            ForeColor = Theme.TextPrimary,
-            BackColor = Theme.Surface,
-            BorderStyle = BorderStyle.FixedSingle,
-            Location = new Point(28, 32),
-            Size = new Size(380, 38)
+            AccessibleName = "搜索应用",
+            AccessibleDescription = "按应用名称或包标识筛选应用列表",
+            Location = new Point(28, 31),
+            Size = new Size(380, 42)
         };
-        Theme.StyleTextInput(_searchBox);
         _searchBox.TextChanged += (_, _) => RenderPackages();
         _statusLabel = new BufferedLabel
         {
